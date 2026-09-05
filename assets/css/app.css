@@ -1,0 +1,2255 @@
+:root{
+  --bg:#f4f6f8;
+  --card:rgba(255,255,255,.94);
+  --text:#17191d;
+  --muted:#7a8089;
+  --line:#e7e9ed;
+  --soft:#f1f3f5;
+  --good:#137a56;
+  --bad:#bf4545;
+  --shadow:0 10px 30px rgba(20,26,34,.055);
+  --shadow-strong:0 16px 42px rgba(20,26,34,.10);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 12% -8%,rgba(105,126,255,.12),transparent 29%),
+    radial-gradient(circle at 96% 4%,rgba(93,205,167,.09),transparent 26%),
+    radial-gradient(circle at 52% 46%,rgba(255,255,255,.62),transparent 38%),
+    linear-gradient(rgba(72,86,108,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(72,86,108,.022) 1px,transparent 1px);
+  background-size:auto,auto,auto,28px 28px,28px 28px;
+  background-attachment:fixed;
+  min-height:100vh;
+}
+body{padding-bottom:96px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:720px;margin:0 auto;padding:18px 14px 30px}
+
+.top{
+  position:sticky;top:0;z-index:30;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  margin:0 -14px 16px;padding:12px 14px 11px;
+  background:rgba(244,246,248,.88);
+  border-bottom:1px solid rgba(226,229,234,.82);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transition:box-shadow .2s ease,background .2s ease;
+}
+.top.is-scrolled{
+  background:rgba(250,251,252,.96);
+  box-shadow:0 7px 22px rgba(20,26,34,.07);
+}
+.title{
+  font-size:23px;font-weight:850;letter-spacing:-.45px;
+  background:linear-gradient(135deg,#15171a,#444b55);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.top-actions{display:flex;gap:7px;align-items:center}
+.month{
+  width:120px;border:0;background:transparent;color:var(--muted);
+  font-weight:700;padding:7px 0
+}
+.icon-btn{
+  width:39px;height:39px;border:1px solid rgba(224,227,232,.95);border-radius:12px;
+  background:rgba(255,255,255,.88);display:grid;place-items:center;font-size:18px;
+  box-shadow:0 5px 16px rgba(20,26,34,.05);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.icon-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(20,26,34,.08);background:#fff}
+.icon-btn:active{transform:translateY(0) scale(.98)}
+
+.new-target-btn{
+  border:1px solid rgba(221,224,229,.95);
+  border-radius:12px;background:rgba(255,255,255,.9);
+  color:var(--text);padding:9px 12px;font-size:12px;font-weight:850;
+  box-shadow:0 5px 16px rgba(20,26,34,.05);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.new-target-btn:hover{
+  transform:translateY(-1px);background:#fff;
+  box-shadow:0 8px 20px rgba(20,26,34,.08)
+}
+.new-target-btn:active{transform:translateY(0) scale(.97)}
+
+.section-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:0 2px 8px
+}
+.section-head h2{font-size:16px;margin:0;font-weight:850;letter-spacing:-.18px}
+.section-head span{font-size:11px;color:var(--muted);font-weight:650}
+
+.goals{
+  display:grid;grid-auto-rows:1fr;
+  background:var(--card);
+  border:1px solid rgba(226,229,234,.92);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.goal{
+  position:relative;
+  padding:14px 14px 13px;
+  border-bottom:1px solid rgba(231,233,237,.95);
+  transition:background .18s ease;
+}
+.goal:last-child{border-bottom:0}
+.goal:hover{background:rgba(248,249,251,.72)}
+.goal::before{
+  content:"";
+  position:absolute;left:0;top:14px;bottom:14px;width:3px;
+  border-radius:0 4px 4px 0;
+  background:linear-gradient(180deg,var(--bar-start,#5967ff),var(--bar-end,#8d73ff));
+  opacity:.9;
+}
+.goal-card{
+  font-size:11px;color:var(--muted);font-weight:760;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.01em
+}
+.goal-title{
+  font-size:14.5px;font-weight:850;line-height:1.35;margin-bottom:5px;letter-spacing:-.1px
+}
+.goal-meta{
+  font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:9px
+}
+.goal-progress-row{
+  display:flex;align-items:center;gap:9px
+}
+.progress{
+  position:relative;flex:1;height:11px;
+  background:rgba(225,228,233,.88);
+  border-radius:999px;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(18,23,29,.06);
+}
+.progress>div{
+  height:100%;
+  width:var(--target-width,0%);
+  background:linear-gradient(90deg,var(--bar-start,#5967ff),var(--bar-end,#8d73ff));
+  border-radius:999px;
+  box-shadow:0 0 12px var(--bar-glow,rgba(89,103,255,.22));
+  transform-origin:left center;
+  animation:progressGrow .82s cubic-bezier(.22,.78,.24,1) both;
+  animation-delay:var(--bar-delay,0ms);
+}
+.progress>div::after{
+  content:"";
+  display:block;width:28%;height:100%;margin-left:auto;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45));
+}
+@keyframes progressGrow{
+  from{transform:scaleX(0);opacity:.55}
+  to{transform:scaleX(1);opacity:1}
+}
+.goal-percent{
+  flex:0 0 auto;min-width:38px;text-align:right;font-size:12px;font-weight:850;
+  color:var(--bar-start,#4f5fff)
+}
+.goal-status{
+  margin-top:6px;font-size:11px;color:var(--muted);line-height:1.4
+}
+.goal-status b{color:var(--text)}
+.goal-days{
+  display:inline-flex;align-items:center;margin-left:6px;font-size:10px;font-weight:780;
+  padding:2px 7px;border-radius:999px;background:rgba(241,243,245,.95);
+  vertical-align:1px;border:1px solid rgba(228,230,234,.8)
+}
+.goal-days.good{color:var(--good);background:rgba(19,122,86,.08);border-color:rgba(19,122,86,.10)}
+.goal-days.warn{color:#9a6a09;background:rgba(224,164,35,.11);border-color:rgba(196,137,18,.16)}
+.goal-days.bad{color:var(--bad);background:rgba(191,69,69,.08);border-color:rgba(191,69,69,.10)}
+
+/* 未達標且尚餘 0–10 日：整個目標以淡紫藍慢閃提示，避免與達標金色混淆；日數格仍獨立紅／黃 */
+.goal.caution-tape{overflow:hidden}
+.goal.caution-tape::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(135deg,rgba(108,126,255,.17),rgba(155,139,255,.12));
+  opacity:.16;
+  box-shadow:inset 0 0 0 1px rgba(89,103,255,.08);
+  animation:goalCoolSlowFlash 4.2s ease-in-out infinite
+}
+@keyframes goalCoolSlowFlash{0%,100%{opacity:.10}50%{opacity:.38}}
+
+.goal{
+  cursor:pointer;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  column-gap:10px;
+}
+.goal-body{min-width:0;height:100%;display:flex;flex-direction:column}
+.goal-status{margin-top:auto;padding-top:6px}
+.goal-modify{
+  align-self:center;
+  width:0;opacity:0;overflow:hidden;pointer-events:none;
+  transform:translateX(16px) scale(.86);
+  border:0;border-radius:10px;background:#17191d;color:#fff;
+  padding:0;font-size:11px;font-weight:850;
+  transition:
+    width .23s cubic-bezier(.22,.8,.2,1),
+    opacity .17s ease,
+    transform .23s cubic-bezier(.22,.8,.2,1),
+    padding .23s ease;
+  position:relative;z-index:3
+}
+.goal.open .goal-modify{
+  width:54px;opacity:1;pointer-events:auto;
+  transform:translateX(0) scale(1);padding:8px 0
+}
+.goal.completed .goal-modify{
+  background:rgba(103,72,8,.88)
+}
+.history-head{margin-top:20px}
+.tx-list{
+  background:var(--card);border:1px solid rgba(226,229,234,.92);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)
+}
+.tx{
+  display:grid;grid-template-columns:1fr auto;gap:10px;
+  padding:12px 13px;border-bottom:1px solid var(--line);
+  transition:background .16s ease
+}
+.tx:hover{background:rgba(248,249,251,.72)}
+.tx:last-child{border-bottom:0}
+.tx-card{font-size:13px;font-weight:750}
+.tx-sub{
+  display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  margin-top:3px;font-size:10.5px;color:var(--muted)
+}
+.pill{background:var(--soft);padding:2px 6px;border-radius:999px}
+.tx-amount{align-self:center;font-size:14px;font-weight:800}
+
+.tx{
+  position:relative;overflow:hidden;cursor:pointer;
+  grid-template-columns:1fr auto auto;
+  align-items:center;
+}
+.tx-content{
+  min-width:0;
+  transition:transform .24s cubic-bezier(.22,.8,.2,1),opacity .2s ease
+}
+.tx-amount{
+  transition:transform .24s cubic-bezier(.22,.8,.2,1)
+}
+.tx-edit{
+  width:0;opacity:0;transform:translateX(16px) scale(.86);
+  overflow:hidden;border:0;border-radius:10px;
+  background:#17191d;color:#fff;font-size:18px;font-weight:850;line-height:1;
+  white-space:nowrap;padding:0;pointer-events:none;
+  display:grid;place-items:center;
+  transition:
+    width .24s cubic-bezier(.22,.8,.2,1),
+    opacity .18s ease,
+    transform .24s cubic-bezier(.22,.8,.2,1),
+    padding .24s ease;
+}
+.tx.open .tx-edit{
+  width:40px;opacity:1;transform:translateX(0) scale(1);
+  padding:8px 0;pointer-events:auto
+}
+.tx-edit:hover{background:#17191d}
+.tx.open .tx-amount{transform:translateX(-2px)}
+.tx.deleting{
+  animation:txDelete .3s cubic-bezier(.4,0,.2,1) forwards
+}
+@keyframes txDelete{
+  to{opacity:0;transform:translateX(28px) scale(.97);max-height:0;padding-top:0;padding-bottom:0}
+}
+.empty{
+  padding:30px 14px;text-align:center;color:var(--muted);font-size:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(247,248,250,.55))
+}
+
+.bottom{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(244,246,248,0),rgba(244,246,248,.88) 28%,rgba(244,246,248,.98) 62%);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
+}
+.add-btn{
+  display:block;width:min(692px,100%);margin:0 auto;border:0;border-radius:16px;
+  background:linear-gradient(135deg,#15171a,#2d3239);
+  color:#fff;padding:14px 16px;font-size:15px;font-weight:850;
+  box-shadow:0 12px 28px rgba(20,24,30,.18);
+  transition:transform .16s ease, box-shadow .16s ease, filter .16s ease
+}
+.add-btn:hover{transform:translateY(-1px);box-shadow:0 15px 34px rgba(20,24,30,.22);filter:brightness(1.04)}
+.add-btn:active{transform:translateY(0) scale(.99)}
+
+.modal{
+  position:fixed;inset:0;z-index:50;background:rgba(22,25,29,.34);
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)
+}
+.modal.show{display:flex}
+.modal.closing .sheet{animation:sheetDown .2s ease both}
+.modal.closing{animation:backdropOut .2s ease both}
+@keyframes sheetDown{to{transform:translateY(18px);opacity:0}}
+@keyframes backdropOut{to{background:rgba(22,25,29,0);backdrop-filter:blur(0)}}
+.sheet{
+  width:min(720px,100%);max-height:90vh;overflow:auto;
+  background:rgba(255,255,255,.98);
+  border-radius:24px 24px 0 0;
+  padding:16px 14px calc(16px + env(safe-area-inset-bottom));
+  box-shadow:0 -20px 50px rgba(17,22,29,.18);
+  animation:sheetUp .24s cubic-bezier(.22,.8,.2,1) both;
+}
+@keyframes sheetUp{
+  from{transform:translateY(18px);opacity:.5}
+  to{transform:translateY(0);opacity:1}
+}
+
+/* ===== 第九版：新增／修改消費由下方彈出 ===== */
+#addModal .sheet{animation:none;transform-origin:center bottom}
+#addModal.show .sheet{animation:addSheetBounceUp .38s cubic-bezier(.18,.86,.24,1.08) both}
+#addModal.closing .sheet{animation:addSheetDrop .22s cubic-bezier(.4,0,.2,1) both}
+#addModal.show{animation:addModalBackdropIn .24s ease both}
+@keyframes addSheetBounceUp{
+  0%{transform:translateY(105%);opacity:.72}
+  72%{transform:translateY(-8px);opacity:1}
+  100%{transform:translateY(0);opacity:1}
+}
+@keyframes addSheetDrop{to{transform:translateY(105%);opacity:.72}}
+@keyframes addModalBackdropIn{from{background:rgba(22,25,29,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}to{background:rgba(22,25,29,.34);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}}
+#addModal.is-editing .confirm{background:linear-gradient(135deg,#273242,#171b21)}
+.sheet-head{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  margin:0 -14px 14px;padding:0 14px 12px;
+}
+#settingsModal .sheet-head{
+  position:sticky;top:-16px;z-index:10;
+  background:rgba(255,255,255,.96);
+  padding-top:16px;
+  border-bottom:1px solid rgba(228,230,234,.9);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.sheet-head h3{font-size:17px;margin:0}
+.close{
+  width:35px;height:35px;border:0;border-radius:50%;
+  background:var(--soft);font-size:19px;color:#4f555d;
+  transition:transform .14s ease, background .14s ease
+}
+.close:hover{background:#e8eaee;transform:rotate(4deg)}
+.close:active{transform:scale(.96)}
+
+.field{margin-bottom:11px}
+.field label{
+  display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px
+}
+input,select{
+  width:100%;border:1px solid var(--line);border-radius:12px;
+  background:#fff;padding:11px 10px;outline:none;color:var(--text);
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease
+}
+input:focus,select:focus{
+  border-color:#aeb5bf;
+  box-shadow:0 0 0 3px rgba(95,111,255,.08);
+  background:#fff
+}
+.confirm{
+  width:100%;border:0;border-radius:13px;
+  background:linear-gradient(135deg,#15171a,#2f343b);
+  color:#fff;padding:13px;font-weight:850;
+  box-shadow:0 9px 22px rgba(18,22,28,.14);
+  transition:transform .15s ease, box-shadow .15s ease
+}
+.confirm:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(18,22,28,.18)}
+.confirm:active{transform:translateY(0) scale(.99)}
+
+
+.offer-tabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  background:#eef0f3;padding:4px;border-radius:13px;margin-bottom:12px
+}
+.offer-tab{
+  border:0;background:transparent;border-radius:10px;padding:9px 8px;
+  font-size:12px;font-weight:820;color:var(--muted);
+  transition:background .15s ease,color .15s ease,box-shadow .15s ease
+}
+.offer-tab.active{
+  background:#fff;color:var(--text);
+  box-shadow:0 3px 10px rgba(20,26,34,.07)
+}
+.offer-panel.hidden{display:none}
+
+.settings-editor.hidden{display:none!important}
+.settings-card{
+  border:1px solid rgba(226,229,234,.95);border-radius:16px;
+  padding:13px;margin-bottom:10px;background:#fff;
+  box-shadow:0 6px 18px rgba(20,26,34,.04)
+}
+.settings-title{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px
+}
+.settings-title h4{margin:0;font-size:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.full{grid-column:1/-1}
+.subhead{
+  font-size:11px;font-weight:800;color:var(--muted);
+  margin:4px 0 8px;padding-top:9px;border-top:1px solid var(--line)
+}
+.toggle-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0 3px
+}
+.toggle-row span{font-size:12px;font-weight:750}
+.switch{
+  position:relative;width:44px;height:26px;background:#d9dce1;border-radius:999px;cursor:pointer
+}
+.switch input{display:none}
+.switch i{
+  position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);transition:.16s
+}
+.switch input:checked + i{left:21px}
+.switch:has(input:checked){background:#111}
+.welcome-fields.hidden{display:none}
+.save-row{display:flex;gap:8px;margin-top:8px}
+.save-row button{
+  flex:1;border:0;border-radius:11px;padding:10px;font-size:12px;font-weight:750
+}
+.save{background:linear-gradient(135deg,#17191d,#30353c);color:#fff}
+.remove{background:#fff1f1;color:var(--bad)}
+.add-card{
+  width:100%;border:1px dashed #cfd2d7;border-radius:13px;background:#fafafa;
+  padding:11px;font-weight:750
+}
+.tiny{font-size:10.5px;color:var(--muted);line-height:1.4}
+
+@media(max-width:460px){
+  .grid2{grid-template-columns:1fr 1fr}
+}
+
+
+/* 簽賬類別標籤 */
+.category-input-row{display:grid;grid-template-columns:1fr 42px;gap:7px}
+.category-add{
+  border:0;border-radius:11px;background:var(--soft);font-weight:900;font-size:18px;
+  color:#4f5660;transition:transform .15s ease,background .15s ease
+}
+.category-add:hover{background:#e8ebef;transform:translateY(-1px)}
+.category-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cat-chip{
+  display:inline-flex;align-items:center;gap:5px;border:1px solid #e1e4e9;
+  border-radius:999px;background:#f6f7f9;padding:5px 8px;font-size:10.5px;
+  font-weight:760;color:#4f5660
+}
+.cat-chip span{font-size:13px;color:#9298a1;line-height:1}
+
+/* 新增消費：計入目標 */
+.target-label{font-size:11px;color:var(--muted);font-weight:700;margin:2px 0 6px}
+.target-picks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.target-pick{
+  position:relative;display:flex;align-items:center;gap:8px;
+  border:1px solid var(--line);border-radius:12px;background:#fff;
+  padding:10px 11px;cursor:pointer;user-select:none;
+  transition:border-color .15s ease,background .15s ease,box-shadow .15s ease
+}
+.target-pick input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.target-dot{
+  width:18px;height:18px;border-radius:6px;border:1.5px solid #c9cdd4;
+  display:grid;place-items:center;flex:0 0 auto;font-size:12px;color:white;
+  transition:.15s ease
+}
+.target-pick strong{font-size:11.5px}
+.target-pick small{display:block;color:var(--muted);font-size:9.5px;margin-top:1px}
+.target-pick:has(input:checked){
+  border-color:rgba(70,85,230,.24);background:rgba(88,103,255,.055);
+  box-shadow:0 3px 12px rgba(50,62,160,.05)
+}
+.target-pick:has(input:checked) .target-dot{
+  border-color:#5967ff;background:#5967ff
+}
+.target-pick:has(input:checked) .target-dot::after{content:"✓"}
+.target-pick.welcome:has(input:checked){
+  border-color:rgba(194,132,27,.25);background:rgba(245,182,54,.07)
+}
+.target-pick.welcome:has(input:checked) .target-dot{
+  border-color:#c98b24;background:#c98b24
+}
+
+/* 達標慶祝：白色由左掃成金色 */
+.goal > *{position:relative;z-index:2}
+.goal.completed{overflow:hidden}
+.goal.completed::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    linear-gradient(105deg,rgba(255,255,255,.05),rgba(255,239,182,.86) 55%,rgba(250,219,113,.66));
+  transform:scaleX(0);transform-origin:left center;
+  animation:goldSweep .9s cubic-bezier(.2,.76,.22,1) .18s forwards
+}
+@keyframes goldSweep{
+  0%{transform:scaleX(0)}
+  100%{transform:scaleX(1)}
+}
+.trophy{
+  display:inline-block;margin-left:5px;font-size:15px;vertical-align:-1px;
+  opacity:0;transform:scale(.35) rotate(-12deg);
+  animation:trophyPop .48s cubic-bezier(.2,1.35,.35,1) 1.02s forwards
+}
+@keyframes trophyPop{
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+.goal.completed .goal-card,
+.goal.completed .goal-meta,
+.goal.completed .goal-status{color:#76601e}
+.goal.completed .goal-percent{color:#8a6410}
+.goal.completed .goal-days.good{
+  color:#76550d;background:rgba(255,255,255,.48);border-color:rgba(139,101,16,.12)
+}
+.tx-target{
+  display:inline-flex;padding:2px 6px;border-radius:999px;font-size:9px;font-weight:800;
+  background:#eef0ff;color:#5967c8
+}
+.tx-target.welcome{background:#fff4d7;color:#9b6a12}
+
+
+button,label.switch,.offer-tab,.cat-chip,.target-pick,.tx{
+  -webkit-tap-highlight-color:transparent
+}
+.offer-panel{
+  animation:panelFade .22s ease both
+}
+@keyframes panelFade{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.existing-list{
+  display:grid;gap:8px;margin-bottom:12px
+}
+.existing-card{
+  position:relative;display:grid;grid-template-columns:1fr auto;gap:10px;
+  align-items:center;overflow:hidden;
+  border:1px solid rgba(226,229,234,.95);border-radius:14px;
+  background:#fff;padding:11px 12px;cursor:pointer;
+  box-shadow:0 5px 16px rgba(20,26,34,.035);
+  transition:background .16s ease,transform .16s ease
+}
+.existing-card:hover{background:#fafbfc}
+.existing-card:active{transform:scale(.995)}
+.existing-card-main{min-width:0}
+.existing-card-name{
+  font-size:13px;font-weight:820;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.existing-card-sub{
+  margin-top:3px;font-size:10.5px;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.modify-btn{
+  width:0;opacity:0;overflow:hidden;pointer-events:none;
+  transform:translateX(14px) scale(.88);
+  border:0;border-radius:10px;background:#111;color:#fff;
+  padding:0;font-size:11px;font-weight:820;
+  transition:width .22s cubic-bezier(.22,.8,.2,1),
+             opacity .16s ease,
+             transform .22s cubic-bezier(.22,.8,.2,1),
+             padding .22s ease
+}
+.existing-card.open .modify-btn{
+  width:54px;opacity:1;pointer-events:auto;
+  transform:translateX(0) scale(1);padding:8px 0
+}
+.settings-editor.hidden{display:none!important}
+.settings-card{
+  animation:cardIn .28s cubic-bezier(.22,.8,.2,1) both
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.tx{
+  animation:txIn .28s cubic-bezier(.22,.8,.2,1) both
+}
+@keyframes txIn{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important
+  }
+}
+
+
+/* ===== 2026 UI refinements ===== */
+.goal-modify{
+  display:grid;place-items:center;font-size:18px;line-height:1;
+}
+.goal.open .goal-modify{width:40px;padding:8px 0}
+
+.card-name-row{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:7px}
+.card-name-picker-btn{
+  border:1px solid var(--line);border-radius:12px;background:#fff;color:#4f5660;
+  font-size:20px;font-weight:900;display:grid;place-items:center;
+  transition:background .15s ease,transform .15s ease,border-color .15s ease
+}
+.card-name-picker-btn:hover{background:#f6f7f9;border-color:#d9dde3;transform:translateY(-1px)}
+.card-name-picker{position:relative}
+.card-name-menu{
+  position:absolute;z-index:25;left:0;right:0;top:calc(100% + 6px);
+  max-height:230px;overflow:auto;padding:6px;background:#fff;
+  border:1px solid rgba(220,224,230,.98);border-radius:13px;
+  box-shadow:0 14px 36px rgba(20,26,34,.14)
+}
+.card-name-menu.hidden{display:none}
+.card-name-option{
+  width:100%;border:0;background:transparent;border-radius:9px;padding:9px 10px;
+  text-align:left;font-size:11.5px;color:var(--text)
+}
+.card-name-option:hover{background:#f1f3f5}
+
+.feature-label{font-size:11px;color:var(--muted);font-weight:700;margin:2px 0 6px}
+.feature-picks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.feature-pick{
+  border:1px solid var(--line);border-radius:12px;background:#f7f8fa;color:#8a9099;
+  padding:10px 11px;text-align:left;font-weight:820;font-size:11.5px;
+  transition:border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease,transform .15s ease
+}
+.feature-pick:hover{transform:translateY(-1px)}
+.feature-pick.active{
+  color:#303cad;border-color:rgba(70,85,230,.25);background:rgba(88,103,255,.075);
+  box-shadow:0 3px 12px rgba(50,62,160,.06)
+}
+.feature-pick.welcome.active{
+  color:#8b5d0f;border-color:rgba(194,132,27,.27);background:rgba(245,182,54,.10)
+}
+.feature-pick .feature-icon{display:inline-grid;place-items:center;width:21px;height:21px;margin-right:5px;border-radius:7px;background:rgba(0,0,0,.055)}
+.offer-config{border-top:1px solid var(--line);padding-top:12px;margin-top:2px}
+.offer-config + .offer-config{margin-top:14px}
+.offer-config.hidden{display:none}
+.offer-config-title{font-size:12px;font-weight:850;margin:0 0 10px}
+
+.category-preset-tags,.custom-category-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.cat-select,.cat-chip{
+  display:inline-flex;align-items:center;gap:5px;border:1px solid #e1e4e9;
+  border-radius:999px;background:#f6f7f9;padding:6px 9px;font-size:10.5px;
+  font-weight:760;color:#6c727b;transition:.15s ease
+}
+.cat-select.active{
+  border-color:rgba(70,85,230,.25);background:rgba(88,103,255,.075);color:#3946b5;
+  box-shadow:0 2px 8px rgba(50,62,160,.05)
+}
+.custom-category-caption{font-size:10px;color:var(--muted);margin-top:9px}
+
+/* 新增消費：Apple Pay 式大字金額輸入 */
+.amount-entry{
+  margin:2px 0 18px;padding:20px 12px 18px;text-align:center;
+  border-bottom:1px solid rgba(230,232,236,.9)
+}
+.amount-caption{font-size:11px;color:var(--muted);font-weight:760;margin-bottom:4px}
+.amount-line{
+  display:flex;align-items:baseline;justify-content:center;gap:5px;
+  min-height:76px;cursor:text
+}
+.amount-currency{font-size:31px;font-weight:720;letter-spacing:-1.2px;color:#17191d}
+#txAmount{
+  width:auto;min-width:28px;max-width:76%;border:0!important;border-radius:0!important;
+  background:transparent!important;padding:0!important;box-shadow:none!important;
+  outline:0;text-align:left;font-size:64px;line-height:1;font-weight:650;
+  letter-spacing:-3.2px;color:#050607;font-variant-numeric:tabular-nums
+}
+#txAmount::placeholder{color:#050607;opacity:1}
+#txAmount::-webkit-outer-spin-button,#txAmount::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.amount-hint{font-size:11px;color:#9a9ea5;font-weight:650;margin-top:6px}
+
+/* 新增消費：Apple Pay 式左右掃信用卡 */
+.tx-card-carousel-field{margin-bottom:14px}
+.tx-card-carousel{
+  --wallet-card-w:min(72vw,300px);
+  display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  padding:7px calc(50% - (var(--wallet-card-w) / 2)) 14px;
+  margin:0 -10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  touch-action:pan-x pan-y;cursor:grab
+}
+.tx-card-carousel:active{cursor:grabbing}
+.tx-card-carousel::-webkit-scrollbar{display:none}
+.tx-card-slide{
+  --card-scale:.91;--card-y:7px;--card-opacity:.46;
+  flex:0 0 var(--wallet-card-w);scroll-snap-align:center;scroll-snap-stop:always;
+  border:0;background:transparent;padding:0;text-align:left;opacity:var(--card-opacity);
+  transform:translateY(var(--card-y)) scale(var(--card-scale));
+  transform-origin:center center;transition:box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent
+}
+.tx-card-slide:focus-visible{outline:3px solid rgba(89,103,255,.20);outline-offset:5px;border-radius:22px}
+.tx-wallet-card{
+  position:relative;height:174px;border-radius:20px;padding:19px 20px 17px;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between;color:#fff;
+  background:linear-gradient(145deg,#17191d,#383e48);
+  box-shadow:0 14px 30px rgba(20,26,34,.16);
+  border:1px solid rgba(255,255,255,.14)
+}
+.tx-wallet-card::before{
+  content:"";position:absolute;width:180px;height:180px;border-radius:50%;
+  right:-70px;top:-85px;background:rgba(255,255,255,.10);pointer-events:none
+}
+.tx-wallet-card::after{
+  content:"";position:absolute;inset:auto -20px -75px auto;width:190px;height:140px;
+  border-radius:50%;background:rgba(255,255,255,.065);transform:rotate(-18deg);pointer-events:none
+}
+.tx-card-slide.tone-1 .tx-wallet-card{background:linear-gradient(145deg,#253569,#647bd2)}
+.tx-card-slide.tone-2 .tx-wallet-card{background:linear-gradient(145deg,#123f3b,#2d8b76)}
+.tx-card-slide.tone-3 .tx-wallet-card{background:linear-gradient(145deg,#5a321f,#c57b47)}
+.tx-card-slide.tone-4 .tx-wallet-card{background:linear-gradient(145deg,#4c254a,#a35c91)}
+.tx-card-slide.tone-5 .tx-wallet-card{background:linear-gradient(145deg,#22384e,#4a83a9)}
+.tx-wallet-top,.tx-wallet-bottom{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tx-wallet-chip{
+  width:36px;height:27px;border-radius:7px;background:linear-gradient(135deg,#f5e2a9,#b9934d);
+  box-shadow:inset 0 0 0 1px rgba(65,45,12,.17);position:relative
+}
+.tx-wallet-chip::before,.tx-wallet-chip::after{content:"";position:absolute;background:rgba(103,76,24,.22)}
+.tx-wallet-chip::before{width:1px;top:0;bottom:0;left:50%}
+.tx-wallet-chip::after{height:1px;left:0;right:0;top:50%}
+.tx-wallet-type{font-size:10px;font-weight:820;letter-spacing:.08em;opacity:.76}
+.tx-wallet-name{position:relative;z-index:2;font-size:19px;font-weight:820;line-height:1.25;letter-spacing:-.25px;max-width:92%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tx-wallet-bottom{font-size:10.5px;font-weight:760;opacity:.76}
+.tx-card-placeholder .tx-wallet-card{
+  color:#6f7580;background:linear-gradient(145deg,#fbfbfc,#eef0f3);
+  border:1px dashed #cfd3d9;box-shadow:0 10px 24px rgba(20,26,34,.06)
+}
+.tx-card-placeholder .tx-wallet-card::before,.tx-card-placeholder .tx-wallet-card::after{display:none}
+.tx-card-placeholder .tx-wallet-icon{font-size:32px;line-height:1;margin-bottom:8px;color:#8c929b}
+.tx-card-placeholder .tx-wallet-name{font-size:16px;color:#555c66}
+.tx-card-placeholder .tx-wallet-bottom{color:#8d939c}
+.tx-card-slide.is-active .tx-wallet-card{box-shadow:0 18px 38px rgba(20,26,34,.20)}
+.tx-card-selected-label{
+  margin-top:-3px;text-align:center;min-height:20px;font-size:11px;color:var(--muted);font-weight:730;
+  transition:color .16s ease,transform .16s ease
+}
+.tx-card-selected-label.has-card{color:#30343a;transform:translateY(-1px)}
+.tx-card-swipe-hint{display:inline-block;animation:cardSwipeHint 1.6s ease-in-out 1}
+@keyframes cardSwipeHint{0%,100%{transform:translateX(0)}35%{transform:translateX(5px)}65%{transform:translateX(-3px)}}
+
+/* 新增消費：可按下亮起／熄滅，不顯示 checkbox 或 tick */
+.target-picks{margin-top:2px}
+.target-pick{
+  cursor:pointer;opacity:1;background:#f5f6f8;color:#7b818a;
+  border-color:#e3e6ea;user-select:none;
+  transition:border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease,transform .12s ease,opacity .15s ease
+}
+.target-pick:hover{transform:translateY(-1px)}
+.target-pick:active{transform:scale(.985)}
+.target-pick.active{
+  color:#303cad;border-color:rgba(70,85,230,.28);background:rgba(88,103,255,.085);
+  box-shadow:0 3px 12px rgba(50,62,160,.07)
+}
+.target-pick.welcome.active{
+  color:#8b5d0f;border-color:rgba(194,132,27,.28);background:rgba(245,182,54,.11)
+}
+.target-dot{
+  width:11px;height:11px;border:0;border-radius:50%;background:#cfd3d9;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.025)
+}
+.target-pick.active .target-dot{background:#5967ff;box-shadow:0 0 0 4px rgba(89,103,255,.10)}
+.target-pick.welcome.active .target-dot{background:#c98b24;box-shadow:0 0 0 4px rgba(201,139,36,.11)}
+.target-pick.disabled{opacity:.38;cursor:not-allowed;box-shadow:none;transform:none}
+.target-pick.disabled .target-dot{background:#d7dae0;box-shadow:none}
+
+@media(max-width:460px){
+  .feature-picks,.target-picks{grid-template-columns:1fr 1fr}
+}
+
+.hidden{display:none!important}
+
+
+/* 第四版：新增消費先選信用卡，再輸入金額；第一張實際信用卡直接置中 */
+#addModal .tx-card-carousel-field{margin-top:0;margin-bottom:5px}
+#addModal .amount-entry{margin:0 0 14px;padding:11px 12px 18px}
+#addModal .tx-card-selected-label{display:none!important;margin:0!important;min-height:0!important}
+.tx-card-empty{
+  width:100%;margin:7px 0 10px;padding:24px 14px;border:1px dashed #cfd3d9;
+  border-radius:18px;background:#f8f9fa;color:var(--muted);text-align:center;
+  font-size:12px;font-weight:720
+}
+.multi-target-picks{grid-template-columns:1fr;gap:8px;margin-bottom:7px}
+.multi-target-picks .target-pick{padding:11px 12px}
+.multi-target-picks .target-pick strong{display:block;font-size:12px;line-height:1.28}
+.multi-target-picks .target-pick small{display:block;margin-top:2px;font-size:9.8px;color:inherit;opacity:.72;line-height:1.35}
+.multi-target-picks .target-pick.welcome{background:#f6f6f7}
+.tx-target-summary{min-height:18px;margin:-1px 1px 12px;font-size:10.5px;color:var(--muted);font-weight:690}
+.tx-target-summary.hit{color:#3f4bb0}
+.tx-target-summary.none{color:#8a8f97}
+.feature-note{font-size:10px;color:var(--muted);margin:-3px 0 8px;line-height:1.45}
+
+
+
+/* ===== 第七版：全屏 Survey Wizard ===== */
+#settingsModal{
+  align-items:stretch;justify-content:stretch;background:#f7f8fa;
+  backdrop-filter:none;-webkit-backdrop-filter:none
+}
+#settingsModal .sheet{
+  width:100%;height:100dvh;max-height:none;overflow:hidden;
+  border-radius:0;padding:0;background:#f7f8fa;box-shadow:none;
+  animation:none;transform-origin:center center
+}
+#settingsModal.show .sheet{animation:wizardFullScreenIn .38s cubic-bezier(.22,.78,.22,1) both}
+#settingsModal.closing .sheet{animation:wizardFullScreenOut .22s cubic-bezier(.4,0,.2,1) both}
+#settingsModal.show{animation:wizardBackdropIn .28s ease both}
+@keyframes wizardFullScreenIn{
+  from{opacity:0;transform:translateX(5.5vw) scale(.992)}
+  to{opacity:1;transform:translateX(0) scale(1)}
+}
+@keyframes wizardFullScreenOut{
+  to{opacity:0;transform:translateX(3.5vw) scale(.995)}
+}
+@keyframes wizardBackdropIn{from{opacity:.25}to{opacity:1}}
+#settingsModal .sheet-head{
+  position:relative;top:auto;z-index:20;
+  display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;
+  width:100%;height:72px;margin:0;padding:10px max(18px,env(safe-area-inset-left)) 10px max(18px,env(safe-area-inset-right));
+  background:rgba(247,248,250,.94);border-bottom:1px solid rgba(226,229,234,.92);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+#settingsModal .sheet-head h3{font-size:18px;text-align:center;margin:0;font-weight:850}
+#settingsModal .close,#settingsModal .wizard-head-back{
+  width:42px;height:42px;border:0;border-radius:50%;background:#eceef2;color:#3e444c;
+  display:grid;place-items:center;font-size:25px;line-height:1;transition:.14s ease
+}
+#settingsModal .wizard-head-back{font-size:34px;padding-bottom:4px}
+#settingsModal .wizard-head-back.is-hidden{opacity:0;pointer-events:none}
+#settingsModal .close:hover,#settingsModal .wizard-head-back:hover{background:#e4e7eb;transform:scale(1.03)}
+#settingsCards{position:relative;height:calc(100dvh - 72px);overflow:hidden}
+.wizard-shell{
+  position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:clamp(26px,5vh,58px) max(22px,calc((100vw - 900px)/2)) calc(52px + env(safe-area-inset-bottom));
+  opacity:1;transform:translateX(0);will-change:transform,opacity
+}
+.wizard-shell.enter-forward{animation:wizardEnterRight .34s cubic-bezier(.22,.78,.22,1) both}
+.wizard-shell.enter-back{animation:wizardEnterLeft .30s cubic-bezier(.22,.78,.22,1) both}
+.wizard-shell.exit-forward{animation:wizardExitLeft .30s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+.wizard-shell.exit-back{animation:wizardExitRight .28s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+@keyframes wizardEnterRight{from{opacity:.25;transform:translateX(24%)}to{opacity:1;transform:translateX(0)}}
+@keyframes wizardEnterLeft{from{opacity:.25;transform:translateX(-18%)}to{opacity:1;transform:translateX(0)}}
+@keyframes wizardExitLeft{to{opacity:.08;transform:translateX(-28%)}}
+@keyframes wizardExitRight{to{opacity:.08;transform:translateX(24%)}}
+.wizard-shell .settings-card{
+  width:min(900px,100%);margin:0 auto;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;animation:none
+}
+.wizard-progress{display:flex;align-items:center;gap:14px;margin:0 0 clamp(28px,5vh,54px);padding:0 2px}
+.wizard-progress-track{height:7px;flex:1;background:#e8ebef;border-radius:999px;overflow:hidden}
+.wizard-progress-fill{height:100%;background:linear-gradient(90deg,#5967ff,#8c72ff);border-radius:999px;transition:width .26s ease}
+.wizard-progress-text{font-size:13px;color:var(--muted);font-weight:820;white-space:nowrap}
+.wizard-question{
+  max-width:820px;font-size:clamp(30px,4.2vw,46px);font-weight:900;letter-spacing:-1.2px;
+  line-height:1.12;margin:0 0 12px
+}
+.wizard-help{max-width:780px;font-size:clamp(14px,1.7vw,18px);color:var(--muted);line-height:1.55;margin:0 0 30px}
+.wizard-options,.wizard-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.wizard-option,.wizard-card-choice{
+  width:100%;height:112px;min-height:112px;border:1px solid #dde1e7;background:#fff;border-radius:20px;
+  padding:19px 20px;text-align:left;display:flex;gap:15px;align-items:center;color:var(--text);
+  box-shadow:0 8px 26px rgba(20,26,34,.045);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease
+}
+.wizard-card-choice{font-size:18px;font-weight:850;line-height:1.35;justify-content:center;text-align:center}
+.wizard-option:hover,.wizard-card-choice:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(20,26,34,.075)}
+.wizard-option.active,.wizard-card-choice.active{border-color:rgba(75,89,230,.34);background:rgba(88,103,255,.075);box-shadow:0 8px 28px rgba(50,62,160,.08)}
+.wizard-option.welcome.active{border-color:rgba(194,132,27,.32);background:rgba(245,182,54,.10)}
+.wizard-option-icon{width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:#f0f2f5;display:grid;place-items:center;font-size:24px;font-weight:900}
+.wizard-option.active .wizard-option-icon{background:rgba(89,103,255,.13);color:#3c49bd}
+.wizard-option-copy strong{display:block;font-size:clamp(17px,2vw,21px);line-height:1.25}
+.wizard-option-copy small{display:block;margin-top:5px;color:var(--muted);font-size:clamp(12px,1.45vw,15px);line-height:1.42;font-weight:620}
+.wizard-option.is-confirming,.wizard-card-choice.is-confirming,.wizard-answer.is-confirming{animation:answerFlash .42s ease both}
+@keyframes answerFlash{
+  0%{transform:scale(1);filter:brightness(1)}
+  18%{transform:scale(.985);filter:brightness(.88)}
+  36%{transform:scale(1.015);filter:brightness(1.14)}
+  55%{transform:scale(.985);filter:brightness(.90)}
+  74%{transform:scale(1.012);filter:brightness(1.12)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+.wizard-section{border:1px solid #e1e5ea;background:#fff;border-radius:20px;padding:20px;margin-bottom:18px;box-shadow:0 8px 26px rgba(20,26,34,.035)}
+.wizard-section-title{font-size:15px;font-weight:850;color:#555d67;margin-bottom:13px}
+.wizard-chip-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.wizard-category-btn{
+  border:1px solid #e0e4e9;border-radius:16px;background:#f8f9fb;padding:14px 10px;
+  font-size:15px;font-weight:800;text-align:center;color:#59606a;transition:.14s ease
+}
+.wizard-category-btn .emoji{display:block;font-size:25px;margin-bottom:5px}
+.wizard-category-btn.active{border-color:rgba(75,89,230,.30);background:rgba(88,103,255,.08);color:#3442ae;box-shadow:0 4px 14px rgba(50,62,160,.07)}
+.wizard-category-btn:active{transform:scale(.98)}
+.wizard-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.wizard-big-field{margin:0}
+.wizard-big-field label{display:block;font-size:15px;color:#59606a;font-weight:800;margin:0 0 8px}
+.wizard-big-field input,.wizard-big-field select,.wizard-name-input{
+  min-height:58px;border-radius:16px;border:1px solid #dfe3e8;background:#fff;padding:13px 15px;
+  font-size:19px;font-weight:720
+}
+.wizard-name-wrap{width:100%;max-width:700px;margin-left:auto;margin-right:auto}
+.wizard-name-input{width:100%;margin-bottom:14px}
+.wizard-answer{
+  display:block;width:100%;max-width:700px;min-height:58px;margin-left:auto;margin-right:auto;border:0;border-radius:18px;background:linear-gradient(135deg,#15171a,#30353c);
+  color:#fff;padding:17px 20px;font-size:17px;font-weight:880;text-align:center;box-shadow:0 10px 26px rgba(18,22,28,.15);transition:.15s ease
+}
+.wizard-answer.secondary{background:#eef0f3;color:#4f5660;box-shadow:none;border:1px solid #e0e3e7}
+.wizard-answer + .wizard-answer{margin-top:10px}
+.wizard-row-card{border:1px solid #e4e7eb;border-radius:18px;background:#fff;padding:16px;margin-bottom:10px}
+.wizard-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;font-size:14px;font-weight:850}
+.wizard-row-remove{border:0;background:#fff0f0;color:var(--bad);border-radius:10px;padding:7px 10px;font-size:12px;font-weight:850}
+.wizard-add-row{width:100%;border:1px dashed #cbd0d7;border-radius:15px;background:#fafbfc;padding:13px;font-size:14px;font-weight:820;color:#5e6570}
+.wizard-summary{border:1px solid #dfe3e8;border-radius:22px;background:#fff;padding:22px;margin-bottom:18px;box-shadow:0 9px 30px rgba(20,26,34,.045)}
+.wizard-summary h4{font-size:22px;margin:0 0 12px}
+.wizard-summary-line{font-size:16px;line-height:1.6;color:#505762;padding:9px 0;border-bottom:1px solid #edf0f3}
+.wizard-summary-line:last-child{border-bottom:0}.wizard-summary-line b{color:#17191d}
+.wizard-danger{margin-top:12px;width:100%;max-width:700px;border:0;border-radius:16px;background:#fff0f0;color:var(--bad);padding:13px;font-size:14px;font-weight:820}
+.mechanic-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;background:#f0f2f5;color:#616873;font-size:9.5px;font-weight:820;margin-left:5px}
+.wizard-mini-note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:10px}
+.wizard-choice-stack{width:100%;max-width:700px;display:grid;gap:10px;margin:0 auto 16px}
+.wizard-choice-stack .wizard-option{height:112px;min-height:112px}
+.wizard-inline-actions{width:100%;max-width:700px;margin:18px auto 0}
+.custom-category-caption{font-size:13px;margin-top:15px}
+.category-input-row{grid-template-columns:1fr 52px;gap:9px}.category-add{border-radius:14px}
+.custom-category-tags{margin-top:10px}.cat-chip{font-size:13px;padding:8px 11px}
+
+
+
+/* ===== 第八版：修改優惠改為同風格全屏清單 ===== */
+.edit-shell{
+  position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:clamp(28px,4.5vh,52px) max(22px,calc((100vw - 900px)/2)) calc(74px + env(safe-area-inset-bottom));
+  animation:editListIn .34s cubic-bezier(.22,.78,.22,1) both
+}
+@keyframes editListIn{from{opacity:.25;transform:translateX(5vw)}to{opacity:1;transform:translateX(0)}}
+.edit-shell .settings-card{width:min(900px,100%);margin:0 auto;padding:0;border:0;background:transparent;box-shadow:none;animation:none}
+.edit-hero{margin:0 0 28px}
+.edit-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:#eceff4;color:#59606a;font-size:12px;font-weight:850;margin-bottom:13px}
+.edit-title{font-size:clamp(30px,4vw,44px);font-weight:920;letter-spacing:-1.1px;line-height:1.12;margin:0 0 9px}
+.edit-subtitle{font-size:clamp(14px,1.6vw,17px);line-height:1.55;color:var(--muted);margin:0}
+.edit-section{border:1px solid #e1e5ea;background:#fff;border-radius:22px;padding:0 22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(20,26,34,.038);overflow:hidden}
+.edit-section-head{padding:20px 0 14px;border-bottom:1px solid #edf0f3}
+.edit-section-head strong{display:block;font-size:17px;font-weight:900;letter-spacing:-.15px}
+.edit-section-head small{display:block;margin-top:4px;font-size:12.5px;line-height:1.45;color:var(--muted);font-weight:650}
+.edit-row{display:grid;grid-template-columns:minmax(170px,34%) minmax(0,1fr);gap:22px;align-items:start;padding:18px 0;border-bottom:1px solid #edf0f3}
+.edit-row:last-child{border-bottom:0}
+.edit-copy{padding-top:7px}
+.edit-label{font-size:15px;font-weight:860;line-height:1.35;color:#2b3036}
+.edit-desc{font-size:11.8px;line-height:1.5;color:var(--muted);margin-top:4px}
+.edit-control input,.edit-control select,.edit-control .wizard-name-input{width:100%;min-height:56px;border-radius:15px;border:1px solid #dfe3e8;background:#fff;padding:12px 14px;font-size:17px;font-weight:720}
+.edit-control .wizard-name-input{margin:0}
+.edit-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edit-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#f0f2f5;padding:7px 11px;font-size:12px;font-weight:820;color:#59606a}
+.edit-pill.welcome{background:#fff4dd;color:#8a6118}
+.edit-categories{margin-top:12px}
+.edit-categories .wizard-chip-row{grid-template-columns:repeat(4,minmax(0,1fr))}
+.edit-actions{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0 0}
+.edit-save{display:block;width:100%;max-width:700px;min-height:60px;border:0;border-radius:18px;background:linear-gradient(135deg,#15171a,#30353c);color:#fff;padding:17px 20px;font-size:17px;font-weight:900;text-align:center;box-shadow:0 10px 26px rgba(18,22,28,.15)}
+.edit-danger{display:block;width:100%;max-width:700px;min-height:52px;border:1px solid #f3d5d5;border-radius:16px;background:#fff4f4;color:var(--bad);padding:14px 18px;font-size:14px;font-weight:850;text-align:center}
+.edit-rule-block{padding:18px 0}
+.edit-rule-block .wizard-section{box-shadow:none;margin-bottom:0;border-color:#e8ebef;background:#fafbfc}
+.edit-rule-block .wizard-row-card{background:#fff}
+.edit-note{font-size:12px;line-height:1.5;color:var(--muted);margin-top:8px}
+@media(max-width:720px){
+  .edit-shell{padding:26px 16px calc(54px + env(safe-area-inset-bottom))}
+  .edit-section{padding:0 16px;border-radius:19px}
+  .edit-row{grid-template-columns:1fr;gap:9px;padding:16px 0}
+  .edit-copy{padding-top:0}.edit-grid2{grid-template-columns:1fr}
+  .edit-categories .wizard-chip-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .edit-control input,.edit-control select,.edit-control .wizard-name-input{font-size:17px}
+}
+
+/* 第七版：印花優惠以印花格顯示進度 */
+.stamp-progress-row{display:flex;align-items:center;gap:12px;margin-top:2px}
+.stamp-track{flex:1;display:flex;flex-wrap:wrap;gap:7px;align-items:center;min-height:38px}
+.stamp-mark{
+  position:relative;width:34px;height:34px;border-radius:10px;border:1px dashed #cfd4db;
+  background:#f1f3f6;display:grid;place-items:center;font-size:18px;filter:grayscale(1);opacity:.52;
+  transition:transform .18s ease,opacity .18s ease,background .18s ease,border-color .18s ease
+}
+.stamp-mark.earned{filter:none;opacity:1;background:#fff5df;border-style:solid;border-color:#e1bd69;box-shadow:0 4px 12px rgba(177,126,23,.10)}
+.stamp-mark.milestone{border-style:solid;border-color:#b8bec7;background:#f7f8fa;opacity:.78}
+.stamp-mark.milestone::before{
+  content:"★";position:absolute;right:-5px;top:-6px;z-index:2;width:15px;height:15px;border-radius:50%;
+  display:grid;place-items:center;background:#fff;color:#9a6a09;border:1px solid #e4c77e;
+  font-size:8px;line-height:1;box-shadow:0 2px 6px rgba(112,86,25,.12);filter:none
+}
+.stamp-mark.milestone::after{content:"";position:absolute;inset:-3px;border:1.5px solid rgba(201,139,36,.58);border-radius:12px;pointer-events:none}
+.stamp-mark.milestone.earned{opacity:1;filter:none;background:#fff0c9;border-color:#d6aa48;box-shadow:0 5px 14px rgba(177,126,23,.14)}
+.stamp-count-label{flex:0 0 auto;min-width:62px;text-align:right;font-size:13px;font-weight:880;color:#8a6410;white-space:nowrap}
+.stamp-scale-note{font-size:9px;color:var(--muted);margin-left:4px;font-weight:720}
+
+/* 日期統一用 年 / 月 / 日 三格輸入 */
+.date-parts{display:grid;grid-template-columns:minmax(92px,1.45fr) auto minmax(64px,1fr) auto minmax(64px,1fr);align-items:center;gap:7px;width:100%}
+.date-parts input{min-width:0!important;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.date-sep{color:#a0a6ae;font-size:18px;font-weight:800;text-align:center;user-select:none}
+.date-parts.compact{grid-template-columns:minmax(82px,1.4fr) auto minmax(58px,1fr) auto minmax(58px,1fr)}
+.date-parts.is-invalid input{
+  border-color:#cf4545!important;background:#fff8f8!important;
+  box-shadow:0 0 0 3px rgba(207,69,69,.10)!important
+}
+
+/* 簽賬／回贈上限：有／沒有及類型格子選項 */
+.cap-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.cap-choice{border:1px solid #dfe3e8;border-radius:16px;background:#f8f9fb;padding:14px 12px;min-height:62px;font-size:15px;font-weight:850;color:#646b75;text-align:center;transition:.15s ease}
+.cap-choice:hover{transform:translateY(-1px);background:#fff}
+.cap-choice.active{border-color:rgba(75,89,230,.32);background:rgba(88,103,255,.085);color:#3442ae;box-shadow:0 4px 14px rgba(50,62,160,.07)}
+.cap-choice-note{margin-top:8px;font-size:11.5px;line-height:1.45;color:var(--muted)}
+.limit-fields{display:grid;gap:16px}
+.limit-cap-amount{margin-top:2px}
+.limit-question-label{font-size:20px!important;line-height:1.35;color:#20242a!important;font-weight:900!important;letter-spacing:-.18px;margin-bottom:10px!important}
+.limit-reveal{margin-top:12px;padding-top:2px;animation:limitRevealIn .30s cubic-bezier(.22,.78,.22,1) both}
+.limit-reveal label{font-size:15px!important;color:#59606a!important;font-weight:800!important}
+@keyframes limitRevealIn{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+.cap-enabled-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.cap-enabled-choice{border:1px solid #dfe3e8;border-radius:16px;background:#f8f9fb;padding:14px 12px;min-height:58px;font-size:15px;font-weight:850;color:#646b75;text-align:center;transition:.15s ease}
+.cap-enabled-choice:hover{transform:translateY(-1px);background:#fff}
+.cap-enabled-choice.active{border-color:rgba(75,89,230,.32);background:rgba(88,103,255,.085);color:#3442ae;box-shadow:0 4px 14px rgba(50,62,160,.07)}
+.threshold-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.threshold-mode-choice{border:1px solid #dfe3e8;border-radius:17px;background:#f8f9fb;padding:14px 12px;min-height:92px;text-align:left;color:#5d646e;transition:.15s ease}
+.threshold-mode-choice:hover{transform:translateY(-1px);background:#fff}
+.threshold-mode-choice.active{border-color:rgba(75,89,230,.32);background:rgba(88,103,255,.085);color:#3442ae;box-shadow:0 4px 14px rgba(50,62,160,.07)}
+.threshold-mode-choice strong{display:block;font-size:14px;line-height:1.28;font-weight:900}
+.threshold-mode-choice small{display:block;margin-top:5px;font-size:11px;line-height:1.42;color:var(--muted);font-weight:650}
+.threshold-category-note{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:680px){.threshold-mode-grid{grid-template-columns:1fr}.threshold-mode-choice{min-height:72px}}
+.cap-type-block{padding-top:4px;border-top:1px solid #edf0f3;animation:capTypeFadeIn .30s cubic-bezier(.22,.78,.22,1) both}
+@keyframes capTypeFadeIn{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+.edit-date-stack{display:grid;grid-template-columns:1fr;gap:12px}
+
+/* 手機友善信用卡清單：不用瀏覽器 datalist */
+.wizard-card-picker{width:100%;max-width:700px;margin:0 auto 16px}
+.wizard-card-picker-toggle{
+  width:100%;min-height:62px;border:1px solid #dfe3e8;border-radius:17px;background:#fff;
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  color:#2e3339;font-size:16px;font-weight:850;text-align:left;box-shadow:0 6px 20px rgba(20,26,34,.04);
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent
+}
+.wizard-card-picker-toggle .picker-chevron{font-size:20px;color:#7f858e;transition:transform .16s ease}
+.wizard-card-picker.open .picker-chevron{transform:rotate(180deg)}
+.wizard-card-picker-panel{
+  margin-top:9px;border:1px solid #dfe3e8;border-radius:17px;background:#fff;padding:10px;
+  box-shadow:0 14px 34px rgba(20,26,34,.10);animation:cardPickerIn .18s ease both
+}
+.wizard-card-picker-panel.hidden{display:none}
+@keyframes cardPickerIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.wizard-card-picker-search{width:100%;min-height:50px!important;margin:0 0 8px;border-radius:13px!important;font-size:16px!important}
+.wizard-card-picker-options{max-height:310px;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:grid;gap:5px}
+.wizard-card-picker-option{
+  width:100%;border:0;border-radius:12px;background:#f7f8fa;padding:12px 13px;text-align:left;
+  color:#32373d;font-size:14px;font-weight:760;line-height:1.35;touch-action:manipulation
+}
+.wizard-card-picker-option:active{background:#eceff4}
+.wizard-card-picker-option.is-existing::after{content:"已加入";float:right;margin-left:8px;color:#737b86;font-size:10px;font-weight:850;background:#e9edf3;border-radius:999px;padding:3px 7px}
+.wizard-card-picker-empty{padding:18px 10px;text-align:center;color:var(--muted);font-size:13px}
+
+@media(max-width:720px){
+  #settingsModal .sheet-head{height:64px;grid-template-columns:44px minmax(0,1fr) 44px;padding:8px 14px}
+  #settingsCards{height:calc(100dvh - 64px)}
+  .wizard-shell{padding:26px 16px calc(42px + env(safe-area-inset-bottom))}
+  .wizard-progress{margin-bottom:30px}.wizard-question{font-size:30px}.wizard-help{font-size:14px;margin-bottom:22px}
+  .wizard-options,.wizard-card-grid{grid-template-columns:1fr;gap:10px}
+  .wizard-option,.wizard-card-choice{height:96px;min-height:96px;padding:15px 16px}.wizard-option-icon{width:42px;height:42px;flex-basis:42px;font-size:21px}
+  .wizard-option-copy strong{font-size:18px}.wizard-option-copy small{font-size:12.5px}
+  .wizard-chip-row{grid-template-columns:repeat(2,minmax(0,1fr))}.wizard-category-btn{font-size:14px;padding:12px 8px}
+  .wizard-input-grid{grid-template-columns:1fr}.wizard-big-field input,.wizard-big-field select,.wizard-name-input{font-size:18px}
+  .wizard-summary-line{font-size:14px}.wizard-summary h4{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){
+  .wizard-shell.enter-forward,.wizard-shell.enter-back,.wizard-shell.exit-forward,.wizard-shell.exit-back,.wizard-option.is-confirming,.wizard-card-choice.is-confirming,.wizard-answer.is-confirming,.goal.caution-tape::after,.cap-type-block,.wizard-card-picker-panel{animation-duration:.01ms!important}
+}
+
+
+
+
+/* 修改／新增消費：標題及關閉按鈕固定於頂部 */
+#addModal .sheet-head{
+  position:sticky;top:-16px;z-index:16;
+  margin:-16px -14px 14px;padding:16px 14px 12px;
+  background:rgba(255,255,255,.965);border-bottom:1px solid rgba(228,230,234,.90);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+
+/* 信用卡清單按銀行分組 */
+.wizard-card-bank-group{display:grid;gap:5px;margin:0 0 10px}
+.wizard-card-bank-group:last-child{margin-bottom:0}
+.wizard-card-bank-title{
+  position:sticky;top:0;z-index:2;padding:7px 9px 5px;margin:0;
+  background:rgba(255,255,255,.95);color:#858b94;font-size:10.5px;font-weight:900;letter-spacing:.02em
+}
+.wizard-card-bank-group.hidden{display:none!important}
+
+/* 網頁內提示／確認：不使用瀏覽器原生 alert / confirm */
+.app-notice{
+  position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:120;
+  max-width:min(560px,calc(100vw - 28px));transform:translate(-50%,-12px);
+  padding:11px 14px;border-radius:14px;background:rgba(27,31,38,.94);color:#fff;
+  box-shadow:0 14px 38px rgba(20,26,34,.20);font-size:13px;font-weight:760;line-height:1.45;
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)
+}
+.app-notice.show{opacity:1;transform:translate(-50%,0)}
+.app-notice.success{background:rgba(20,116,82,.95)}
+.app-notice.warn{background:rgba(135,83,17,.95)}
+.app-confirm-layer{
+  position:fixed;inset:0;z-index:125;display:none;align-items:center;justify-content:center;
+  padding:22px;background:rgba(20,24,30,.34);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+}
+.app-confirm-layer.show{display:flex;animation:appConfirmIn .18s ease both}
+@keyframes appConfirmIn{from{opacity:0}to{opacity:1}}
+.app-confirm-card{width:min(390px,100%);background:#fff;border:1px solid #e5e8ec;border-radius:20px;padding:20px;box-shadow:0 20px 60px rgba(20,26,34,.20)}
+.app-confirm-title{font-size:18px;font-weight:900;margin-bottom:8px}
+.app-confirm-message{font-size:13px;color:var(--muted);line-height:1.55;white-space:pre-line}
+.app-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.app-confirm-actions button{border:0;border-radius:13px;padding:12px;font-weight:850}
+.app-confirm-cancel{background:#eef0f3;color:#4f5660}.app-confirm-ok{background:#fff0f0;color:var(--bad)}
+
+/* 修改消費：頁內刪除按鈕 */
+.tx-delete-action{
+  width:100%;margin-top:9px;border:1px solid #f0d3d3;border-radius:13px;background:#fff4f4;
+  color:var(--bad);padding:12px 14px;font-size:13px;font-weight:850;transition:background .15s ease,transform .15s ease
+}
+.tx-delete-action:hover{background:#ffecec}.tx-delete-action:active{transform:scale(.99)}
+.tx-delete-action.hidden{display:none!important}
+
+/* 新增優惠：已有目標的信用卡可直接揀 */
+.wizard-existing-cards{width:100%;max-width:700px;margin:0 auto 18px}
+.wizard-existing-cards-title{font-size:13px;color:#5f6670;font-weight:850;margin:0 0 9px}
+.wizard-existing-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wizard-existing-card{
+  border:1px solid #dde1e7;border-radius:17px;background:#fff;padding:14px 15px;text-align:left;min-height:76px;
+  box-shadow:0 6px 20px rgba(20,26,34,.04);color:#252a30;transition:.15s ease
+}
+.wizard-existing-card:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(20,26,34,.07)}
+.wizard-existing-card strong{display:block;font-size:15px;line-height:1.32;font-weight:880}
+.wizard-existing-card small{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:720}
+.wizard-existing-card.active{border-color:rgba(75,89,230,.32);background:rgba(88,103,255,.07)}
+.wizard-other-card-label{width:100%;max-width:700px;margin:4px auto 8px;font-size:12px;color:var(--muted);font-weight:800}
+@media(max-width:560px){.wizard-existing-card-grid{grid-template-columns:1fr}}
+
+.stamp-bulk{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:7px 11px;border-radius:11px;border:1px dashed #cfd4db;background:#f1f3f6;color:#727983;font-size:12px;font-weight:880}
+.stamp-bulk.earned{border-style:solid;border-color:#e1bd69;background:#fff5df;color:#8a6410;box-shadow:0 4px 12px rgba(177,126,23,.08)}
+.stamp-mode-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
+
+
+
+/* ===== v7：新增優惠首頁層次、單一捲軸、目標卡空間及階段狀態 ===== */
+html.modal-open,body.modal-open{overflow:hidden!important;overscroll-behavior:none}
+#settingsModal{overflow:hidden!important}
+.wizard-or-divider{
+  width:100%;max-width:700px;margin:17px auto;display:flex;align-items:center;gap:12px;
+  color:#a0a5ad;font-size:12px;font-weight:850;text-align:center
+}
+.wizard-or-divider::before,.wizard-or-divider::after{content:"";height:1px;flex:1;background:#e1e4e9}
+.wizard-card-step-label{width:100%;max-width:700px;margin:0 auto 9px;font-size:14px;color:#4d545e;font-weight:880}
+.wizard-existing-cards{margin-bottom:0}
+.wizard-existing-cards-title{font-size:14px;color:#4d545e;margin-bottom:10px}
+.wizard-existing-card.is-confirming{animation:answerFlash .42s ease both}
+.wizard-card-picker{margin-bottom:0}
+.wizard-name-wrap .wizard-name-input{margin-bottom:12px}
+
+/* 未達標且尚餘 0–10 日：改為較清晰的冰藍／青藍慢閃，與達標金色分開 */
+.goal.caution-tape::after{
+  background:linear-gradient(135deg,rgba(58,157,226,.25),rgba(62,199,188,.18))!important;
+  box-shadow:inset 0 0 0 1.5px rgba(43,139,205,.20)!important;
+  animation:goalUrgencyBlueFlash 3.3s ease-in-out infinite!important
+}
+@keyframes goalUrgencyBlueFlash{
+  0%,100%{opacity:.20}
+  50%{opacity:.64}
+}
+
+/* 等高後把進度／狀態自然壓到底部，中間空間可用來展示階段資訊 */
+.goal-body{height:100%;display:flex;flex-direction:column}
+.goal-lower{margin-top:auto}
+.goal-status{margin-top:7px!important;padding-top:0!important}
+.goal-stage-panel{
+  margin:2px 0 10px;padding:9px 10px;border:1px solid rgba(218,223,230,.92);border-radius:12px;
+  background:rgba(248,249,251,.84);display:grid;gap:7px
+}
+.goal-stage-current{font-size:11px;font-weight:880;color:#343a42;line-height:1.42}
+.goal-stage-current .stage-date{display:block;margin-top:2px;color:#707780;font-size:10.5px;font-weight:720}
+.goal-stage-history{display:flex;flex-wrap:wrap;gap:6px}
+.goal-stage-state{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;font-size:9.8px;font-weight:850;line-height:1.25}
+.goal-stage-state.success{color:#137a56;background:rgba(19,122,86,.08);border:1px solid rgba(19,122,86,.11)}
+.goal-stage-state.fail{color:#b84545;background:rgba(191,69,69,.075);border:1px solid rgba(191,69,69,.11)}
+.goal-stage-state.pending{color:#747b84;background:#eef0f3;border:1px solid #e1e4e8}
+
+@media(max-width:560px){
+  .wizard-or-divider{margin:14px auto}
+  .goal-stage-current{font-size:10.7px}
+}
+@media (prefers-reduced-motion:reduce){
+  .wizard-existing-card.is-confirming,.goal.caution-tape::after{animation-duration:.01ms!important}
+}
+
+
+
+/* ===== v8：額度進度改為緊湊等高，避免以最高內容卡拉高全組 ===== */
+#goals .goal{
+  height:142px;
+  min-height:142px;
+  padding:10px 14px 9px;
+  align-items:stretch;
+}
+#goals .goal-body{min-height:0;overflow:hidden}
+#goals .goal-card{margin-bottom:1px;line-height:1.2}
+#goals .goal-title{
+  margin-bottom:2px;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#goals .goal-meta{
+  margin-bottom:5px;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#goals .goal-lower{margin-top:auto;min-width:0}
+#goals .goal-status{
+  margin-top:4px!important;padding-top:0!important;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* 階段資料由大盒改成一條資訊列；保留日期及上一階段結果，但不犧牲卡高 */
+#goals .goal-stage-panel{
+  min-height:29px;margin:0 0 5px;padding:4px 7px;
+  display:flex;align-items:center;gap:7px;
+  border-radius:10px;background:rgba(248,249,251,.78);
+}
+#goals .goal-stage-current{
+  min-width:0;display:flex;align-items:center;gap:5px;
+  font-size:10.5px;line-height:1.15;white-space:nowrap;
+}
+#goals .goal-stage-current .stage-date{
+  display:inline!important;margin:0!important;
+  font-size:9.5px;line-height:1.15;white-space:nowrap;
+}
+#goals .goal-stage-history{
+  margin-left:auto;display:flex;flex-wrap:nowrap;gap:4px;
+  min-width:0;overflow:hidden;
+}
+#goals .goal-stage-state{
+  flex:0 0 auto;padding:2px 5px;font-size:9px;white-space:nowrap;
+}
+
+/* 印花列縮細；多於 8 個會用「🔖 × N」摘要，避免換行撐高 */
+#goals .stamp-progress-row{gap:8px;margin-top:0;min-height:30px}
+#goals .stamp-track{min-height:30px;gap:5px;flex-wrap:nowrap;overflow:hidden}
+#goals .stamp-mark{width:28px;height:28px;border-radius:9px;font-size:15px}
+#goals .stamp-mark.milestone::before{right:-4px;top:-5px;width:13px;height:13px;font-size:7px}
+#goals .stamp-mark.milestone::after{inset:-2px;border-radius:10px}
+#goals .stamp-count-label{min-width:54px;font-size:11.5px}
+#goals .stamp-bulk{min-height:28px;padding:5px 8px;border-radius:9px;font-size:10.5px}
+
+@media(max-width:460px){
+  #goals .goal{height:146px;min-height:146px;padding:10px 12px 9px}
+  #goals .goal-stage-panel{gap:5px;padding-left:6px;padding-right:6px}
+  #goals .goal-stage-current{font-size:10px}
+  #goals .goal-stage-current .stage-date{font-size:9px}
+  #goals .goal-stage-state{font-size:8.6px;padding:2px 4px}
+}
+
+
+/* ===== v9：主頁資訊再整理 ===== */
+/* 簽賬要求改為較大、較易掃讀；最多兩行，仍維持緊湊等高 */
+#goals .goal-meta{
+  margin-bottom:6px;
+  color:#5e6670;
+  font-size:12.4px;
+  font-weight:760;
+  line-height:1.32;
+  white-space:normal;
+  overflow:hidden;
+  text-overflow:clip;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+}
+
+/* 階段卡不再在進度條前重複顯示「目前階段＋日期」；只保留過往階段結果 */
+#goals .goal-stage-history-only{
+  margin:0 0 5px;
+  display:flex;
+  flex-wrap:nowrap;
+  gap:4px;
+  min-width:0;
+  overflow:hidden;
+}
+#goals .goal-stage-history-only .goal-stage-state{
+  flex:0 0 auto;
+}
+
+/* 印花列善用卡內橫向空位：可逐個顯示時把印花放大 */
+#goals .stamp-progress-row{min-height:40px;gap:9px}
+#goals .stamp-track{min-height:40px;gap:6px}
+#goals .stamp-mark{
+  width:36px;
+  height:36px;
+  border-radius:11px;
+  font-size:21px;
+}
+#goals .stamp-mark.milestone::before{
+  right:-5px;top:-6px;width:15px;height:15px;font-size:8px;
+}
+#goals .stamp-mark.milestone::after{inset:-3px;border-radius:13px}
+#goals .stamp-count-label{font-size:12.5px;min-width:58px}
+
+@media(max-width:460px){
+  #goals .goal-meta{font-size:11.8px;line-height:1.3}
+  #goals .stamp-progress-row,#goals .stamp-track{min-height:38px}
+  #goals .stamp-mark{width:34px;height:34px;font-size:20px}
+}
+
+
+/* ===== v10：主頁額度卡文字層次 ===== */
+#goals .goal{
+  height:156px;
+  min-height:156px;
+}
+#goals .goal-card{
+  /* 尚餘時間固定在第一行右上角，預留空間避免蓋住卡名 */
+  padding-right:112px;
+}
+#goals .goal-title{
+  /* 尚餘時間已移到右上角，優惠名稱可使用完整第二行寬度 */
+  padding-right:0;
+}
+#goals .goal-days{
+  position:absolute;
+  top:6px;
+  right:8px;
+  margin-left:0;
+  z-index:4;
+  font-size:12.5px;
+  font-weight:860;
+  line-height:1.1;
+  padding:4px 8px;
+  letter-spacing:-.08px;
+  white-space:nowrap;
+  box-shadow:0 2px 8px rgba(20,26,34,.045);
+}
+#goals .goal-meta{
+  display:block;
+  -webkit-line-clamp:unset;
+  overflow:visible;
+  white-space:normal;
+  margin-top:1px;
+  margin-bottom:6px;
+}
+#goals .goal-meta-line{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.42;
+}
+@media(max-width:460px){
+  #goals .goal{height:160px;min-height:160px}
+  #goals .goal-days{top:5px;right:7px;font-size:12px;padding:4px 7px}
+  #goals .goal-card{padding-right:106px}
+}
+
+/* ===== v11：印花優惠主頁格式 ===== */
+#goals .goal:has(.stamp-progress-row){height:184px;min-height:184px}
+#goals .goal:has(.stamp-progress-row) .goal-meta{margin-bottom:4px}
+#goals .stamp-progress-row{
+  display:block;
+  min-height:0;
+  margin-top:0;
+}
+#goals .stamp-track{
+  display:flex;
+  min-height:34px;
+  gap:5px;
+  margin-bottom:2px;
+}
+#goals .stamp-mark{
+  width:31px;
+  height:31px;
+  font-size:19px;
+}
+#goals .stamp-count-label{
+  display:block;
+  min-width:0;
+  text-align:left;
+  font-size:12.5px;
+  line-height:1.25;
+  margin-top:1px;
+}
+#goals .goal:has(.stamp-progress-row) .goal-status{margin-top:4px!important}
+@media(max-width:460px){
+  #goals .goal:has(.stamp-progress-row){height:188px;min-height:188px}
+  #goals .stamp-track{min-height:32px}
+  #goals .stamp-mark{width:30px;height:30px;font-size:18px}
+}
+
+
+
+/* ===== v12：主頁卡片等高＋金額重點＋電脈衝進度 ===== */
+/* 不再由 grid 的最高內容撐高其他 row；每張卡直接同高、緊貼排列。 */
+#goals{
+  display:block;
+}
+#goals .goal{
+  height:176px!important;
+  min-height:176px!important;
+  margin:0!important;
+}
+#goals .goal:has(.stamp-progress-row){
+  height:176px!important;
+  min-height:176px!important;
+}
+#goals .goal + .goal{margin-top:0!important}
+
+/* 狀態中的金額加粗，方便快速掃讀。 */
+#goals .goal-status b{
+  color:var(--text);
+  font-weight:900;
+}
+
+/* 進度條：保留原本漸層，再加一束電脈衝光掃過已完成部分。 */
+#goals .progress>div{
+  position:relative;
+  overflow:hidden;
+  animation:progressGrow .82s cubic-bezier(.22,.78,.24,1) both,
+            progressElectricPulse 2.4s ease-in-out 1.05s infinite;
+  animation-delay:var(--bar-delay,0ms),calc(var(--bar-delay,0ms) + 900ms);
+}
+#goals .progress>div::after{
+  content:"";
+  position:absolute;
+  top:-55%;
+  bottom:-55%;
+  left:-38%;
+  width:28%;
+  margin:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),rgba(255,255,255,.98),rgba(255,255,255,.20),transparent);
+  transform:skewX(-18deg);
+  filter:blur(.15px);
+  opacity:0;
+  animation:progressElectricSweep 2.4s cubic-bezier(.2,.72,.2,1) calc(var(--bar-delay,0ms) + 900ms) infinite;
+}
+@keyframes progressElectricSweep{
+  0%,18%{left:-38%;opacity:0}
+  28%{opacity:.92}
+  62%{opacity:.78}
+  76%,100%{left:118%;opacity:0}
+}
+@keyframes progressElectricPulse{
+  0%,100%{box-shadow:0 0 9px var(--bar-glow,rgba(89,103,255,.18))}
+  45%{box-shadow:0 0 15px var(--bar-glow,rgba(89,103,255,.30))}
+  56%{box-shadow:0 0 7px var(--bar-glow,rgba(89,103,255,.18))}
+}
+
+@media(max-width:460px){
+  #goals .goal,
+  #goals .goal:has(.stamp-progress-row){height:180px!important;min-height:180px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #goals .progress>div,
+  #goals .progress>div::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
+
+/* ===== v13：較慢電脈衝＋主頁要求重點＋加粗進度條 ===== */
+/* 主頁要求列的金額／迎新日數由 renderGoalMeta() 包成 <b>。 */
+#goals .goal-meta-line{
+  font-weight:850;
+}
+#goals .goal-meta b{
+  color:var(--text);
+  font-weight:920;
+}
+
+/* 進度條加粗，仍保持圓角。 */
+#goals .progress{
+  height:15px;
+  border-radius:999px;
+}
+
+/*
+   電脈衝改成「慢掃一次 + 較長休息」：
+   - 一個完整循環 6.8 秒
+   - 真正掃光只集中在中段，前後大部分時間維持安靜
+*/
+#goals .progress>div{
+  animation:progressGrow .82s cubic-bezier(.22,.78,.24,1) both,
+            progressElectricPulseSlow 6.8s ease-in-out 1.4s infinite;
+  animation-delay:var(--bar-delay,0ms),calc(var(--bar-delay,0ms) + 1.2s);
+}
+#goals .progress>div::after{
+  width:24%;
+  left:-34%;
+  animation:progressElectricSweepSlow 6.8s cubic-bezier(.22,.72,.18,1) calc(var(--bar-delay,0ms) + 1.2s) infinite;
+}
+@keyframes progressElectricSweepSlow{
+  0%,18%{left:-34%;opacity:0}
+  22%{opacity:.22}
+  28%{opacity:.92}
+  48%{left:116%;opacity:.72}
+  54%,100%{left:116%;opacity:0}
+}
+@keyframes progressElectricPulseSlow{
+  0%,18%,58%,100%{box-shadow:0 0 8px var(--bar-glow,rgba(89,103,255,.16))}
+  30%{box-shadow:0 0 14px var(--bar-glow,rgba(89,103,255,.28))}
+  46%{box-shadow:0 0 10px var(--bar-glow,rgba(89,103,255,.20))}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #goals .progress>div,
+  #goals .progress>div::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
+
+/* ===== v14：進行中的回贈目標＋排序工具 ===== */
+.goal-section-head{
+  gap:12px;
+}
+.goal-section-head h2{
+  flex:0 0 auto;
+  font-size:17px;
+}
+.goal-head-tools{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  min-width:0;
+}
+.goal-sort-control{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  height:32px;
+  padding:0 5px 0 9px;
+  border:1px solid rgba(221,224,229,.96);
+  border-radius:10px;
+  background:rgba(255,255,255,.9);
+  box-shadow:0 3px 10px rgba(20,26,34,.035);
+}
+.goal-sort-label{
+  flex:0 0 auto;
+  font-size:10px!important;
+  font-weight:800!important;
+  color:#8a9099!important;
+}
+#goalSortSelect{
+  width:auto;
+  min-width:104px;
+  height:30px;
+  border:0;
+  border-radius:8px;
+  padding:0 22px 0 2px;
+  background:transparent;
+  box-shadow:none;
+  outline:none;
+  color:#343a42;
+  font-size:10.8px;
+  font-weight:820;
+  cursor:pointer;
+}
+#goalSortSelect:focus{box-shadow:none;border:0}
+.goal-sort-dir{
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  border:1px solid rgba(221,224,229,.96);
+  border-radius:10px;
+  background:rgba(255,255,255,.92);
+  color:#444b55;
+  font-size:16px;
+  font-weight:900;
+  line-height:1;
+  box-shadow:0 3px 10px rgba(20,26,34,.035);
+  transition:transform .14s ease,background .14s ease;
+}
+.goal-sort-dir:hover{background:#fff;transform:translateY(-1px)}
+.goal-sort-dir:active{transform:scale(.96)}
+
+/* 排序洗牌動畫：卡片依新次序滑到位置，並有輕微左右交錯感。 */
+#goals.is-shuffling{
+  overflow:visible;
+}
+#goals.is-shuffling .goal{
+  will-change:transform,opacity;
+  pointer-events:none;
+  position:relative;
+}
+
+@media(max-width:600px){
+  .goal-section-head{flex-wrap:wrap;align-items:center}
+  .goal-section-head h2{font-size:16px}
+  .goal-head-tools{width:100%;gap:6px}
+  .goal-sort-control{height:31px}
+  #goalSortSelect{min-width:99px;font-size:10.4px}
+  .goal-sort-dir{width:31px;height:31px;flex-basis:31px}
+}
+
+
+
+/* ===== 門檻／階段：新增按鈕置於表格外 + 新列向下展開動畫 ===== */
+.milestone-stage-table,.threshold-tier-table{margin-bottom:10px}
+.milestone-add-row,.threshold-add-row{
+  display:block;
+  border:1px solid rgba(100,78,220,.30);
+  background:linear-gradient(135deg,#6657d9,#846cf0);
+  color:#fff;
+  box-shadow:0 8px 20px rgba(91,73,203,.18);
+  transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
+}
+.milestone-add-row,.threshold-add-row{margin:0 0 18px}
+.milestone-add-row:hover,.threshold-add-row:hover{transform:translateY(-1px);box-shadow:0 11px 25px rgba(91,73,203,.24);filter:brightness(1.03)}
+.milestone-add-row:active,.threshold-add-row:active{transform:scale(.99);box-shadow:0 6px 15px rgba(91,73,203,.16)}
+.wizard-row-card.row-added{
+  overflow:hidden;
+  transform-origin:top center;
+  will-change:height,opacity,transform,padding,margin;
+  animation:ruleRowExpandDown .68s cubic-bezier(.2,.82,.24,1) both;
+}
+.wizard-row-card.row-removing{
+  overflow:hidden;
+  pointer-events:none;
+  transform-origin:top center;
+  will-change:height,opacity,transform,padding,margin,border-width;
+  animation:ruleRowCollapseUp .40s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes ruleRowExpandDown{
+  0%{
+    height:0;
+    min-height:0;
+    opacity:0;
+    transform:translateY(-8px);
+    padding-top:0;
+    padding-bottom:0;
+    margin-bottom:0;
+    border-top-width:0;
+    border-bottom-width:0;
+  }
+  72%{opacity:1}
+  100%{
+    height:var(--rule-row-height,auto);
+    min-height:0;
+    opacity:1;
+    transform:translateY(0);
+    padding-top:16px;
+    padding-bottom:16px;
+    margin-bottom:10px;
+  }
+}
+@keyframes ruleRowCollapseUp{
+  0%{
+    height:var(--rule-row-height,auto);
+    min-height:0;
+    opacity:1;
+    transform:translateY(0);
+    padding-top:16px;
+    padding-bottom:16px;
+    margin-bottom:10px;
+    border-top-width:1px;
+    border-bottom-width:1px;
+  }
+  48%{opacity:.68;transform:translateY(-4px)}
+  100%{
+    height:0;
+    min-height:0;
+    opacity:0;
+    transform:translateY(-10px);
+    padding-top:0;
+    padding-bottom:0;
+    margin-bottom:0;
+    border-top-width:0;
+    border-bottom-width:0;
+  }
+}
+.wizard-option.list-create-option{grid-column:1/-1}
+.edit-shell.list-create-shell{animation:none}
+/* v22：由問卷切換到清單時沿用頁面左掃方向；返回則向右退出。 */
+.edit-shell.list-create-shell.list-enter-forward{animation:listCreateEnterForward .34s cubic-bezier(.22,.78,.22,1) both}
+.edit-shell.list-create-shell.list-exit-back{animation:listCreateExitBack .28s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+@keyframes listCreateEnterForward{from{opacity:.24;transform:translateX(24%)}to{opacity:1;transform:translateX(0)}}
+@keyframes listCreateExitBack{to{opacity:.08;transform:translateX(24%)}}
+
+
+/* ===== v15：主頁緊湊卡、同列排序、消費紀錄頁、上限互換 ===== */
+/* 主頁目標標題與排序永遠維持同一行。 */
+.goal-section-head{flex-wrap:nowrap!important;align-items:center;gap:8px}
+.goal-section-head h2{white-space:nowrap;min-width:0}
+.goal-head-tools{width:auto!important;flex:1 1 auto;min-width:0;gap:5px}
+.goal-sort-control{flex:0 1 142px;min-width:118px;max-width:142px}
+#goalSortSelect{min-width:0!important;width:100%}
+@media(max-width:600px){
+  .goal-section-head{flex-wrap:nowrap!important;gap:6px}
+  .goal-section-head h2{font-size:14.6px!important;letter-spacing:-.3px}
+  .goal-head-tools{width:auto!important;flex:1 1 auto;gap:4px}
+  .goal-sort-control{height:31px;flex:0 1 132px;min-width:108px;max-width:132px;padding-left:7px}
+  #goalSortSelect{width:100%;min-width:0!important;font-size:10.1px;padding-right:18px}
+  .goal-sort-dir{width:31px;height:31px;flex-basis:31px}
+}
+@media(max-width:390px){
+  .goal-section-head h2{font-size:13.7px!important}
+  .goal-sort-label{display:none}
+  .goal-sort-control{flex-basis:122px;min-width:100px;max-width:122px;padding-left:5px}
+}
+
+/* 卡片比 v12 約矮一行；簽賬要求最多顯示三行。 */
+#goals .goal,#goals .goal:has(.stamp-progress-row){height:162px!important;min-height:162px!important}
+#goals .goal-meta{max-height:4.3em;overflow:hidden;margin-bottom:4px}
+#goals .goal-meta-line{line-height:1.38}
+#goals .goal-lower{margin-top:auto}
+@media(max-width:460px){
+  #goals .goal,#goals .goal:has(.stamp-progress-row){height:164px!important;min-height:164px!important}
+}
+
+/* 主頁消費紀錄：筆數與「查看更多」放在右側。 */
+.history-head-actions{display:flex;align-items:center;gap:9px;margin-left:auto}
+.history-more{
+  border:0;background:transparent;color:#4c58c5;padding:4px 1px;font-size:11px;
+  font-weight:850;text-decoration:none;white-space:nowrap
+}
+.history-more:hover{text-decoration:underline}
+
+/* 簽賬上限／回贈上限雙向連動欄位。 */
+.linked-cap-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.linked-cap-field label{display:block;font-size:12px;color:#59606a;font-weight:800;margin:0 0 7px}
+.linked-cap-hint{
+  grid-column:1/-1;margin-top:-1px;padding:9px 10px;border-radius:11px;
+  background:#f4f5f8;color:#747b84;font-size:11px;font-weight:690;line-height:1.45
+}
+.linked-cap-hint b{color:#343a42;font-weight:880}
+@media(max-width:520px){.linked-cap-fields{grid-template-columns:1fr 1fr;gap:8px}.linked-cap-field label{font-size:11px}}
+
+/* 內置「另一頁」：保留同一 HTML / localStorage，file:// 開啟亦可直接讀到資料。 */
+.transaction-page{padding-bottom:34px}
+.transaction-page-top{
+  position:sticky;top:0;z-index:30;display:grid;grid-template-columns:42px minmax(0,1fr) 122px;
+  align-items:center;gap:8px;margin:0 -14px 16px;padding:11px 14px;
+  background:rgba(244,246,248,.94);border-bottom:1px solid rgba(226,229,234,.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+.transaction-page-back{
+  width:39px;height:39px;border:1px solid rgba(224,227,232,.95);border-radius:12px;background:#fff;
+  color:#343a42;font-size:26px;line-height:1;display:grid;place-items:center
+}
+.transaction-page-title{font-size:20px;font-weight:900;letter-spacing:-.45px;text-align:center}
+.transaction-page-month{width:122px;border:0;background:transparent;color:#656c76;font-weight:780;padding:7px 0;text-align:right}
+.transaction-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 10px;
+  color:#69717b;font-size:11px;font-weight:740
+}
+.transaction-summary b{color:#17191d;font-size:13px}
+.transaction-page .tx{cursor:pointer;grid-template-columns:1fr auto auto}
+.transaction-page .tx:hover{background:rgba(248,249,251,.72)}
+.transaction-page .tx-amount{transform:none!important}
+body.history-route{padding-bottom:20px}
+@media(max-width:420px){
+  .transaction-page-top{grid-template-columns:40px minmax(0,1fr) 112px}
+  .transaction-page-title{font-size:18px}
+  .transaction-page-month{width:112px;font-size:12px}
+}
+
+/* ===== v14：主頁 ↔ 消費紀錄頁滑動轉場 ===== */
+body.route-transitioning{overflow-x:hidden}
+#mainApp,#transactionPage{will-change:transform,opacity}
+.route-enter-from-right{animation:routeEnterFromRight .28s cubic-bezier(.22,.78,.22,1) both}
+.route-exit-to-left{animation:routeExitToLeft .22s cubic-bezier(.4,0,.2,1) both}
+.route-enter-from-left{animation:routeEnterFromLeft .28s cubic-bezier(.22,.78,.22,1) both}
+.route-exit-to-right{animation:routeExitToRight .22s cubic-bezier(.4,0,.2,1) both}
+@keyframes routeEnterFromRight{from{transform:translateX(100%);opacity:.72}to{transform:translateX(0);opacity:1}}
+@keyframes routeExitToLeft{from{transform:translateX(0);opacity:1}to{transform:translateX(-34%);opacity:.32}}
+@keyframes routeEnterFromLeft{from{transform:translateX(-34%);opacity:.32}to{transform:translateX(0);opacity:1}}
+@keyframes routeExitToRight{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.72}}
+
+/* ===== v15：新增／修改統一清單、正向 Toggle、展開／收合動畫 ===== */
+.edit-shell.list-create-shell .edit-hero{margin-bottom:18px}
+.edit-shell.list-create-shell .edit-section{border-radius:18px}
+.edit-shell.list-create-shell .edit-section-head{padding:16px 0 11px}
+.edit-shell.list-create-shell .edit-section-head small{margin-top:3px}
+.edit-shell.list-create-shell .edit-row{
+  grid-template-columns:minmax(132px,34%) minmax(0,1fr);gap:16px;align-items:center;padding:14px 0
+}
+.edit-shell.list-create-shell .edit-copy{padding-top:0}
+.edit-shell.list-create-shell .edit-desc{margin-top:3px}
+.edit-shell.list-create-shell .edit-control{min-width:0}
+.edit-shell.list-create-shell .edit-control input,
+.edit-shell.list-create-shell .edit-control select,
+.edit-shell.list-create-shell .edit-control .wizard-name-input{min-height:48px;border-radius:13px;font-size:15px;padding:10px 12px}
+
+/* 「有」在左、「沒有」在右：開啟時圓點靠「有」，關閉時靠「沒有」。 */
+.edit-yn-toggle{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-height:44px}
+.edit-yn-toggle>span{font-size:12px;font-weight:850;color:#9aa0a8;transition:color .20s ease,transform .20s ease}
+.edit-yn-toggle>span.active{color:#20242a;transform:scale(1.03)}
+.edit-switch{
+  --switch-travel:20px;
+  position:relative;flex:0 0 48px;width:48px;height:28px;border:0;border-radius:999px;padding:0;
+  background:#d9dde3;box-shadow:inset 0 0 0 1px rgba(20,26,34,.05);
+  transition:background .24s ease,box-shadow .24s ease,transform .18s ease
+}
+.edit-switch:active{transform:scale(.96)}
+.edit-switch i{
+  position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 6px rgba(20,26,34,.20);
+  transform:translateX(var(--switch-travel));
+  transition:transform .28s cubic-bezier(.22,.9,.24,1),box-shadow .24s ease
+}
+.edit-switch.on{background:#17191d;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.edit-switch.on i{transform:translateX(0);box-shadow:0 2px 7px rgba(0,0,0,.28)}
+.edit-switch:focus-visible{outline:3px solid rgba(89,103,255,.18);outline-offset:2px}
+
+/* 任何因選項而出現的文字格／下拉／設定區，都由上向下展開；關閉時向上收埋。 */
+.ui-expandable,.limit-reveal,.edit-categories,.linked-cap-fields,.edit-rule-block.ui-expandable{
+  overflow:hidden;transform-origin:top center;
+  animation:uiExpandDown .32s cubic-bezier(.22,.78,.22,1) both
+}
+.ui-collapsing{
+  overflow:hidden!important;pointer-events:none!important;
+  animation:uiCollapseUp .25s cubic-bezier(.4,0,.2,1) both!important
+}
+@keyframes uiExpandDown{
+  0%{max-height:0;opacity:0;transform:translateY(-8px)}
+  72%{opacity:1}
+  100%{max-height:1600px;opacity:1;transform:translateY(0)}
+}
+@keyframes uiCollapseUp{
+  0%{max-height:var(--ui-collapse-height,800px);opacity:1;transform:translateY(0)}
+  55%{opacity:.72;transform:translateY(-3px)}
+  100%{max-height:0;opacity:0;transform:translateY(-9px);margin-top:0;padding-top:0;padding-bottom:0;border-width:0}
+}
+
+.edit-shell.list-create-shell .limit-reveal{margin-top:9px}
+.edit-shell.list-create-shell .edit-rule-block{padding:0}
+.edit-shell.list-create-shell .edit-rule-block>.edit-row{padding-left:0;padding-right:0}
+.edit-shell.list-create-shell .linked-cap-fields{grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.edit-shell.list-create-shell .linked-cap-field label{font-size:10px}
+.edit-shell.list-create-shell .linked-cap-hint{font-size:10px;padding:7px 8px}
+.edit-shell.list-create-shell .edit-dynamic-row{overflow:hidden}
+
+@media(max-width:720px){
+  /* 新增同修改都保留「左描述、右選擇」，不轉成上下排列。 */
+  .edit-shell.list-create-shell .edit-row{grid-template-columns:minmax(112px,39%) minmax(0,1fr);gap:11px;padding:13px 0}
+  .edit-shell.list-create-shell .edit-label{font-size:13px}
+  .edit-shell.list-create-shell .edit-desc{font-size:10px;line-height:1.35}
+  .edit-shell.list-create-shell .edit-control input,
+  .edit-shell.list-create-shell .edit-control select,
+  .edit-shell.list-create-shell .edit-control .wizard-name-input{min-height:44px;font-size:14px;padding:9px 10px}
+  .edit-shell.list-create-shell .edit-grid2{grid-template-columns:1fr}
+  .edit-shell.list-create-shell .date-parts,
+  .edit-shell.list-create-shell .date-parts.compact{grid-template-columns:minmax(46px,1.35fr) auto minmax(34px,1fr) auto minmax(34px,1fr);gap:3px}
+  .edit-shell.list-create-shell .date-sep{font-size:14px}
+  .edit-shell.list-create-shell .date-part{padding-left:4px!important;padding-right:4px!important;font-size:12px!important}
+}
+@media(max-width:390px){
+  .edit-shell.list-create-shell{padding-left:10px;padding-right:10px}
+  .edit-shell.list-create-shell .edit-section{padding-left:12px;padding-right:12px}
+  .edit-shell.list-create-shell .edit-row{grid-template-columns:104px minmax(0,1fr);gap:8px}
+  .edit-shell.list-create-shell .edit-desc{display:none}
+  .edit-yn-toggle{gap:6px}.edit-switch{--switch-travel:16px;flex-basis:44px;width:44px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .route-enter-from-right,.route-exit-to-left,.route-enter-from-left,.route-exit-to-right{animation-duration:.01ms!important}
+}
+
+
+
+/* ===== v16：清單互動穩定化 + 所有玩法左右欄 ===== */
+/* 清單模式不再因重新 render 而重播整頁展開動畫。真正新增/收起的欄位由 JS 做局部高度動畫。 */
+.edit-shell.list-create-shell{scrollbar-gutter:stable;overflow-anchor:auto}
+.edit-shell.list-create-shell .ui-expandable,
+.edit-shell.list-create-shell .limit-reveal,
+.edit-shell.list-create-shell .edit-categories,
+.edit-shell.list-create-shell .linked-cap-fields,
+.edit-shell.list-create-shell .edit-rule-block.ui-expandable{
+  animation:none!important;transform:none!important;max-height:none!important;opacity:1;overflow:visible
+}
+.edit-shell.list-create-shell .edit-rule-block{overflow:visible}
+
+/* 門檻／階段／印花改成真正「左描述、右控制」清單。 */
+.list-rule-group{
+  border:1px solid #e6e9ee;border-radius:15px;background:#fbfcfd;
+  margin:10px 0 12px;padding:0 13px;overflow:hidden
+}
+.list-rule-group-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:44px;padding:9px 0;border-bottom:1px solid #e9ecf0
+}
+.list-rule-group-head strong{font-size:13px;font-weight:900;letter-spacing:-.1px}
+.list-rule-group-head small{color:var(--muted);font-size:10px;font-weight:700}
+.list-rule-delete{
+  border:0;border-radius:9px;background:#fff0f0;color:var(--bad);
+  padding:6px 9px;font-size:10.5px;font-weight:850;white-space:nowrap
+}
+.list-rule-group .edit-row{padding:11px 0!important}
+.list-rule-group .edit-row:last-child{border-bottom:0}
+.list-rule-add{
+  width:100%;border:1px dashed #c7ccd4;border-radius:12px;background:#fafbfc;
+  padding:10px 12px;color:#5d6470;font-size:12px;font-weight:850;margin:5px 0 10px
+}
+.list-rule-note{font-size:10.5px;line-height:1.45;color:var(--muted);padding:4px 1px 10px}
+.list-control-stack{display:grid;gap:7px}
+.list-control-stack.compact{grid-template-columns:1fr 1fr}
+.list-inline-note{margin-top:6px;font-size:10px;line-height:1.42;color:var(--muted)}
+.list-category-panel{padding:10px 0 2px}
+.list-category-panel .wizard-chip-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.list-category-panel .wizard-category-btn{font-size:11px;padding:9px 6px;border-radius:12px}
+.list-category-panel .wizard-category-btn .emoji{font-size:20px;margin-bottom:3px}
+.list-slot{min-height:0}
+
+/* 局部內容高度動畫，不會重建整張清單。 */
+.v16-animating{overflow:hidden!important;will-change:height,transform}
+.v16-new-row{animation:v16NewRow .34s cubic-bezier(.22,.8,.22,1) both}
+@keyframes v16NewRow{from{opacity:.35;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+
+/* 回贈率未設定前，上限輸入保持鎖定，避免「先填上限但無法換算」的怪邏輯。 */
+.linked-cap-fields.cap-rate-pending{opacity:.78}
+.linked-cap-fields.cap-rate-pending input{background:#f3f4f6!important;color:#8c929a!important;cursor:not-allowed}
+.linked-cap-hint.cap-rate-pending{
+  background:#fff8e7;color:#806520;border:1px solid rgba(173,128,28,.13)
+}
+.linked-cap-hint.cap-rate-pending b{color:#6d5519}
+
+@media(max-width:720px){
+  .list-rule-group{padding:0 10px;margin:8px 0 10px}
+  .list-rule-group .edit-row{grid-template-columns:minmax(102px,39%) minmax(0,1fr)!important;gap:9px!important;padding:10px 0!important}
+  .list-category-panel .wizard-chip-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .list-rule-group .edit-row{grid-template-columns:98px minmax(0,1fr)!important;gap:7px!important}
+  .list-rule-group-head strong{font-size:12px}
+}
+
+
+
+/* ===== v17：Toggle 可反覆開關、合資格範圍改成全闊 chips、問卷流程與清單邏輯一致 ===== */
+/* 合資格簽賬範圍不採左右欄：標題在上、類別按鈕全闊排列。 */
+.list-eligibility-scope{padding:15px 0 13px;border-bottom:1px solid #edf0f3}
+.list-eligibility-scope-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.list-eligibility-scope-title{font-size:14px;font-weight:900;color:#2b3036}
+.list-eligibility-scope-status{margin-top:3px;font-size:10.5px;line-height:1.35;color:var(--muted);font-weight:690}
+.list-eligibility-all{
+  flex:0 0 auto;border:1px solid #dfe3e8;border-radius:999px;background:#f7f8fa;color:#626a74;
+  padding:6px 9px;font-size:10.5px;font-weight:850;transition:background .16s ease,border-color .16s ease,transform .14s ease
+}
+.list-eligibility-all:active{transform:scale(.97)}
+.list-eligibility-chip-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.eligibility-chip{
+  min-width:0;border:1px solid #e0e4e9;border-radius:12px;background:#f8f9fb;color:#676f79;
+  min-height:48px;padding:7px 4px;font-size:10.5px;font-weight:820;text-align:center;line-height:1.2;
+  transition:background .17s ease,border-color .17s ease,color .17s ease,box-shadow .17s ease,transform .13s ease
+}
+.eligibility-chip .emoji{display:block;font-size:18px;line-height:1;margin-bottom:4px}
+.eligibility-chip.active{border-color:rgba(75,89,230,.30);background:rgba(88,103,255,.085);color:#3442ae;box-shadow:0 3px 10px rgba(50,62,160,.055)}
+.eligibility-chip:active{transform:scale(.97)}
+.list-eligibility-custom{margin-top:11px;padding-top:10px;border-top:1px solid #edf0f3}
+.list-eligibility-custom .custom-category-caption{margin:0 0 7px;font-size:10.5px}
+.list-eligibility-custom .category-input-row{grid-template-columns:1fr 46px}
+.list-eligibility-custom-chip{cursor:pointer}
+
+/* Toggle 本身只靠目前 on/off 狀態決定下一次動作；動畫保留，而且可來回滑動。 */
+.edit-switch,.edit-switch i{will-change:transform}
+.edit-switch i{transition:transform .26s cubic-bezier(.22,.88,.24,1),box-shadow .22s ease}
+.edit-switch.on i{transform:translateX(0)}
+.edit-switch:not(.on) i{transform:translateX(var(--switch-travel))}
+
+@media(max-width:720px){
+  .list-eligibility-chip-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .eligibility-chip{min-height:45px;padding:6px 2px;font-size:9.6px;border-radius:10px}
+  .eligibility-chip .emoji{font-size:17px;margin-bottom:3px}
+}
+@media(max-width:390px){
+  .list-eligibility-chip-grid{gap:5px}
+  .eligibility-chip{min-height:44px;font-size:9px;padding-left:1px;padding-right:1px}
+  .list-eligibility-scope-title{font-size:13px}
+}
+
+
+
+/* ===== v19：門檻進度節點 + 門檻獎賞上限邏輯 ===== */
+/* 門檻獎賞主頁：在進度條上方顯示獎賞、下方顯示門檻金額。 */
+#goals .goal:has(.tier-progress-row){height:184px!important;min-height:184px!important}
+.tier-progress-row{display:flex;align-items:center;gap:9px;min-width:0;margin-top:0}
+.tier-progress-shell{position:relative;flex:1;min-width:0;padding:20px 0 19px}
+.tier-progress-shell .progress{width:100%}
+.tier-progress-marker{position:absolute;left:var(--tier-pos);top:50%;width:0;height:0;z-index:4;pointer-events:none}
+.tier-progress-marker::before{
+  content:"";position:absolute;left:-1px;top:-7px;width:2px;height:14px;border-radius:2px;
+  background:rgba(71,77,87,.48);box-shadow:0 0 0 2px rgba(255,255,255,.72)
+}
+.tier-marker-reward,.tier-marker-threshold{
+  position:absolute;left:0;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.08px
+}
+.tier-marker-reward{bottom:10px;transform:translateX(-50%);font-size:10.4px;font-weight:900;color:#4b515a}
+.tier-marker-reward b{font-weight:950;color:#252a30}
+.tier-marker-threshold{top:10px;transform:translateX(-50%);font-size:10px;font-weight:790;color:#7a8089}
+.tier-progress-marker.edge-start .tier-marker-reward,.tier-progress-marker.edge-start .tier-marker-threshold{transform:translateX(0)}
+.tier-progress-marker.edge-end .tier-marker-reward,.tier-progress-marker.edge-end .tier-marker-threshold{transform:translateX(-100%)}
+.tier-progress-row .goal-percent{align-self:center;margin-top:0}
+@media(max-width:460px){
+  #goals .goal:has(.tier-progress-row){height:188px!important;min-height:188px!important}
+  .tier-progress-row{gap:7px}.tier-progress-shell{padding-top:20px;padding-bottom:18px}
+  .tier-marker-reward{font-size:9.8px}.tier-marker-threshold{font-size:9.6px}
+}
+/* v19：門檻玩法即使未有可換算回贈率，簽賬上限仍可直接輸入。 */
+.linked-cap-field input:disabled{background:#f3f4f6!important;color:#959aa2!important;cursor:not-allowed}
+
+
+/* ===== v25：門檻錯層、金額置於進度條下、上限只作 100% 尺度、固定卡片主題色 ===== */
+#goals .goal:has(.spend-progress-row){height:196px!important;min-height:196px!important}
+.spend-progress-row{display:flex;align-items:center;gap:9px;min-width:0;margin-top:0}
+.spend-progress-shell{
+  position:relative;flex:1;min-width:0;height:70px;padding:0;overflow:visible;
+}
+.spend-progress-shell .progress{
+  position:absolute;left:0;right:0;top:38px;width:100%;
+}
+.spend-progress-marker{
+  position:absolute;left:var(--marker-pos);top:38px;width:0;height:0;z-index:5;pointer-events:none;
+}
+/* 門檻直線只向上連到獎賞文字；門檻金額固定顯示在進度條下方。 */
+.spend-progress-marker::before{
+  content:"";position:absolute;left:-1px;bottom:-1px;width:2px;border-radius:2px;
+  background:rgba(71,77,87,.52);box-shadow:0 0 0 2px rgba(255,255,255,.76);
+}
+.spend-progress-marker.lane-0::before{height:22px}
+.spend-progress-marker.lane-1::before{height:38px}
+.spend-progress-marker.lane-2::before{height:52px}
+.spend-marker-title,.spend-marker-amount{
+  position:absolute;left:0;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.08px;
+}
+.spend-marker-title{font-size:9.8px;line-height:1.15;font-weight:900;color:#40464f}
+.spend-marker-title b{font-weight:950;color:#23282e}
+.spend-marker-amount{font-size:9.4px;line-height:1.15;font-weight:790;color:#7a8089}
+.spend-progress-marker.lane-0 .spend-marker-title{bottom:17px;transform:translateX(-50%)}
+.spend-progress-marker.lane-1 .spend-marker-title{bottom:33px;transform:translateX(-50%)}
+.spend-progress-marker.lane-2 .spend-marker-title{bottom:47px;transform:translateX(-50%)}
+.spend-progress-marker.lane-0 .spend-marker-amount{top:10px;transform:translateX(-50%)}
+.spend-progress-marker.lane-1 .spend-marker-amount{top:23px;transform:translateX(-50%)}
+.spend-progress-marker.lane-2 .spend-marker-amount{top:36px;transform:translateX(-50%)}
+.spend-progress-marker.edge-start .spend-marker-title,.spend-progress-marker.edge-start .spend-marker-amount{transform:translateX(0)}
+.spend-progress-marker.edge-end .spend-marker-title,.spend-progress-marker.edge-end .spend-marker-amount{transform:translateX(-100%)}
+.spend-progress-marker.minimum .spend-marker-title{color:#555d67}
+.spend-progress-row .goal-percent{align-self:center;margin-top:0}
+/* v19 舊 marker 不再使用，保留 selector 只為舊 DOM 安全。 */
+.tier-progress-shell{padding:0;height:70px}
+.tier-progress-shell .progress{top:38px}
+@media(max-width:460px){
+  #goals .goal:has(.spend-progress-row){height:202px!important;min-height:202px!important}
+  .spend-progress-row{gap:7px}.spend-progress-shell{height:72px}
+  .spend-marker-title{font-size:9.2px}.spend-marker-amount{font-size:8.9px}
+}
+
+/* ===== v26：恢復卡片主題色 + 門檻標示精準對齊進度條 ===== */
+/* 主題色不只留在進度條：非完成卡片加入很淡的同色底，仍保留白底閱讀感。 */
+#goals .goal:not(.completed){
+  background:
+    linear-gradient(102deg,
+      var(--theme-soft,rgba(89,103,255,.09)) 0%,
+      var(--theme-fade,rgba(140,114,255,.04)) 46%,
+      rgba(255,255,255,.97) 100%);
+}
+#goals .goal:not(.completed):hover{
+  background:
+    linear-gradient(102deg,
+      var(--theme-soft-hover,rgba(89,103,255,.12)) 0%,
+      var(--theme-fade-hover,rgba(140,114,255,.06)) 48%,
+      #fff 100%);
+}
+
+/* 進度條固定在 shell 中段；marker 的原點改到進度條垂直中心。 */
+#goals .goal:has(.spend-progress-row){height:202px!important;min-height:202px!important}
+.spend-progress-row{align-items:flex-start}
+.spend-progress-shell,.tier-progress-shell{height:78px!important}
+.spend-progress-shell .progress,.tier-progress-shell .progress{top:40px!important}
+.spend-progress-marker{top:47.5px!important}
+
+/* 直線真正穿過進度條：由獎賞文字向下連到進度條底部，而不是停在條的上方。 */
+.spend-progress-marker::before{bottom:-7.5px!important}
+.spend-progress-marker.lane-0::before{height:31px!important}
+.spend-progress-marker.lane-1::before{height:47px!important}
+.spend-progress-marker.lane-2::before{height:61px!important}
+
+/* 獎賞文字仍可錯層；所有門檻金額則統一放在進度條正下方。 */
+.spend-progress-marker.lane-0 .spend-marker-title{bottom:20px!important}
+.spend-progress-marker.lane-1 .spend-marker-title{bottom:36px!important}
+.spend-progress-marker.lane-2 .spend-marker-title{bottom:50px!important}
+.spend-progress-marker .spend-marker-amount{top:13px!important}
+.spend-progress-marker.lane-0 .spend-marker-amount,
+.spend-progress-marker.lane-1 .spend-marker-amount,
+.spend-progress-marker.lane-2 .spend-marker-amount{transform:translateX(-50%)}
+.spend-progress-marker.edge-start .spend-marker-amount{transform:translateX(0)!important}
+.spend-progress-marker.edge-end .spend-marker-amount{transform:translateX(-100%)!important}
+
+/* 百分比跟進度條本身對齊，不跟整個 78px shell 垂直置中。 */
+.spend-progress-row .goal-percent{align-self:flex-start!important;margin-top:39px!important}
+
+@media(max-width:460px){
+  #goals .goal:has(.spend-progress-row){height:208px!important;min-height:208px!important}
+  .spend-progress-shell,.tier-progress-shell{height:80px!important}
+  .spend-progress-row .goal-percent{margin-top:39px!important}
+}
+
+/* ===== v27：每個目標獨立配色；標記只在真的重疊時錯層 ===== */
+/* 預設所有標記同一高度；JS 量度到文字實際重疊時，才加入 lane-1 / lane-2。 */
+.spend-progress-marker.lane-0::before{height:31px!important}
+.spend-progress-marker.lane-0 .spend-marker-title{bottom:20px!important}
+
+/* ===== v28：門檻線止於進度條底部；達標門檻亮起目標主題色 ===== */
+/* 線可以進入進度條作定位，但不再由進度條底部穿出。同步縮短高度，保持標題端位置不變。 */
+.spend-progress-marker::before{
+  bottom:-3.5px!important;
+  transition:background .2s ease,box-shadow .2s ease;
+}
+.spend-progress-marker.lane-0::before{height:27px!important}
+.spend-progress-marker.lane-1::before{height:43px!important}
+.spend-progress-marker.lane-2::before{height:57px!important}
+.spend-marker-title,.spend-marker-title b,.spend-marker-amount{transition:color .2s ease,text-shadow .2s ease}
+/* 已達到該門檻：標題、門檻金額及定位線跟隨這個目標的主題色。 */
+.spend-progress-marker.reached::before{
+  background:var(--bar-start)!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.78),0 0 7px var(--bar-glow)!important;
+}
+.spend-progress-marker.reached .spend-marker-title,
+.spend-progress-marker.reached .spend-marker-title b,
+.spend-progress-marker.reached .spend-marker-amount{
+  color:var(--bar-start)!important;
+  text-shadow:0 0 8px var(--bar-glow);
+}
+
+
+/* ===== v29：門檻線真正收在進度條內；狀態粗體跟隨目標主題色 ===== */
+/* marker 原點位於進度條內。直線底端停在 marker 原點，不再碰到／穿出進度條底邊。 */
+.spend-progress-marker::before{
+  bottom:0!important;
+  box-shadow:none!important;
+}
+/* 保持各 lane 的線頂端位置與 v28 一致，只把進度條以下的長度收回。 */
+.spend-progress-marker.lane-0::before{height:23.5px!important}
+.spend-progress-marker.lane-1::before{height:39.5px!important}
+.spend-progress-marker.lane-2::before{height:53.5px!important}
+/* 已達標仍用主題色亮起，但 glow 不再形成白色外框延伸到進度條外。 */
+.spend-progress-marker.reached::before{
+  background:var(--bar-start)!important;
+  box-shadow:0 0 5px var(--bar-glow)!important;
+}
+/* 狀態列內所有原本的粗體重點，統一跟隨該目標主題色。 */
+#goals .goal .goal-status b,
+#goals .goal .goal-status strong{
+  color:var(--bar-start)!important;
+}
+
+/* ===== v30：門檻直線嚴格限制在進度條內，並恢復白色透明邊 ===== */
+/* marker 原點仍是進度條垂直中心；直線只畫在 15px 進度條內，不再連到上方標記文字。 */
+.spend-progress-marker::before{
+  top:-5px!important;
+  bottom:auto!important;
+  width:2px!important;
+  height:10px!important;
+  border-radius:2px!important;
+  background:rgba(71,77,87,.56)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.74)!important;
+}
+/* lane 只影響文字高低；直線本身永遠同樣只存在於進度條內。 */
+.spend-progress-marker.lane-0::before,
+.spend-progress-marker.lane-1::before,
+.spend-progress-marker.lane-2::before{height:10px!important}
+/* 已達門檻：直線亮起該目標主題色，同時保留白色透明邊。 */
+.spend-progress-marker.reached::before{
+  background:var(--bar-start)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.78),0 0 4px var(--bar-glow)!important;
+}
+
+
+/* ===== v31：高低門檻標記以直線連回進度條；主頁粗體重點跟隨目標主題色 ===== */
+/*
+   門檻文字仍由 v27 的碰撞偵測分配 lane，避免文字彼此重疊。
+   每個 lane 的定位線由進度條中心垂直延伸至該 lane 標題底邊，
+   讓高／低錯層後仍可一眼確認每個標記屬於哪一個門檻。
+*/
+.spend-progress-marker::before{
+  top:auto!important;
+  bottom:0!important;
+  width:2px!important;
+  border-radius:2px!important;
+  background:rgba(71,77,87,.56)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.74)!important;
+}
+.spend-progress-marker.lane-0::before{height:20px!important}
+.spend-progress-marker.lane-1::before{height:36px!important}
+.spend-progress-marker.lane-2::before{height:50px!important}
+.spend-progress-marker.reached::before{
+  background:var(--bar-start)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.78),0 0 4px var(--bar-glow)!important;
+}
+
+/* 標題本身置於連線之上，並加極淡底色，避免鄰近標記的直線穿過文字造成誤讀。 */
+.spend-marker-title{
+  z-index:2;
+  padding:0 2px;
+  border-radius:3px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 0 0 1px rgba(255,255,255,.52);
+}
+
+/* 「推廣期至日期」及「達標簽賬／回贈上限」等由 renderGoalMeta() 加粗的重點，跟隨目標主題色。 */
+#goals .goal .goal-meta b{
+  color:var(--bar-start)!important;
+}
+
+
+/* ===== v32：連線由進度條底邊起步；錯層連線自動繞開其他標記文字 ===== */
+/*
+   進度條 top=40px、高 15px，所以 marker 原點固定在 bottom edge = 55px。
+   門檻金額仍留在實際門檻 x 座標；只有上方獎賞標題與連線在需要避讓時橫向錯開。
+*/
+.spend-progress-marker{
+  top:55px!important;
+  --route-shift:0px;
+  --route-left:0px;
+  --route-width:0px;
+}
+/* 標題跟隨避讓後的 connector x；門檻金額保持實際 x，不跟著橫移。 */
+.spend-progress-marker .spend-marker-title{left:var(--route-shift,0px)!important}
+.spend-progress-marker.lane-0 .spend-marker-title{bottom:27.5px!important}
+.spend-progress-marker.lane-1 .spend-marker-title{bottom:43.5px!important}
+.spend-progress-marker.lane-2 .spend-marker-title{bottom:57.5px!important}
+.spend-progress-marker .spend-marker-amount{top:5.5px!important}
+
+/* 垂直 connector 從進度條「底邊」向上；不再以進度條中心作起點。 */
+.spend-progress-marker::before{
+  left:calc(var(--route-shift,0px) - 1px)!important;
+  top:auto!important;
+  bottom:0!important;
+  width:2px!important;
+  border-radius:2px!important;
+  background:rgba(71,77,87,.56)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.78)!important;
+}
+.spend-progress-marker.lane-0::before{height:27.5px!important}
+.spend-progress-marker.lane-1::before{height:43.5px!important}
+.spend-progress-marker.lane-2::before{height:57.5px!important}
+
+/* 當需要橫向避讓時，先沿進度條底邊走一小段，再垂直上去；因此不會穿過其他標記文字。 */
+.spend-progress-marker::after{
+  content:"";
+  position:absolute;
+  left:var(--route-left,0px);
+  top:-1px;
+  width:var(--route-width,0px);
+  height:2px;
+  border-radius:2px;
+  background:rgba(71,77,87,.56);
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.78);
+  pointer-events:none;
+  z-index:1;
+}
+.spend-progress-marker.reached::before,
+.spend-progress-marker.reached::after{
+  background:var(--bar-start)!important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.80),0 0 4px var(--bar-glow)!important;
+}
+/* connector 永遠在文字後面；文字本身保持乾淨，不會被線切過。 */
+.spend-marker-title{z-index:3!important}
+
+
+/* ========================================================================== */
