@@ -54,3 +54,13 @@ The home screen now loads `assets/css/home-refinements.css` after the shared the
 - No application logic was changed for this refinement. `assets/js/app.js` remains byte-identical to the previous release.
 
 If the mobile home layout needs further tuning, prefer editing `home-refinements.css` rather than adding another override to `app.css`.
+
+## Transaction history header refinement
+
+The transaction-history view now reuses the shared fixed `brand-nav` geometry used by the home page. Its centred title is `消費紀錄`; the month selector is intentionally outside the fixed header.
+
+History-only presentation rules live in:
+
+- `assets/css/history-refinements.css` — fixed history header integration, compact month control, and grouped monthly summary.
+
+The existing application IDs and JavaScript data flow are preserved (`historyBack`, `historyMonthPicker`, `historyTxCount`, `historyTxTotal`, `historyTxList`). The monthly selector and summary are grouped into a single compact control deck to conserve mobile vertical space.

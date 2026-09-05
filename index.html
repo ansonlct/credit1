@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="assets/css/theme-wbate.css">
 <link rel="stylesheet" href="assets/css/navigation.css">
 <link rel="stylesheet" href="assets/css/home-refinements.css">
+<link rel="stylesheet" href="assets/css/history-refinements.css">
 </head>
 <body>
 <!-- Core layout stays in this file. Styles: assets/css/. App logic: assets/js/app.js. -->
@@ -85,13 +86,35 @@
 </div>
 
 <div id="transactionPage" class="app transaction-page hidden">
-  <div class="transaction-page-top">
+  <nav class="brand-nav transaction-brand-nav top" aria-label="消費紀錄導覽">
     <button id="historyBack" class="transaction-page-back" type="button" aria-label="返回主頁">‹</button>
-    <div class="transaction-page-title">消費紀錄</div>
-    <input id="historyMonthPicker" class="transaction-page-month" type="month" aria-label="選擇月份">
-  </div>
-  <div class="transaction-summary"><span id="historyTxCount">0 筆</span><span>本月總簽賬 <b id="historyTxTotal">$0</b></span></div>
-  <div id="historyTxList" class="tx-list"></div>
+    <div class="transaction-nav-title">消費紀錄</div>
+    <span class="nav-spacer" aria-hidden="true"></span>
+  </nav>
+
+  <section class="history-control-deck" aria-label="消費紀錄月份及本月摘要">
+    <label class="history-month-command" for="historyMonthPicker">
+      <span class="history-command-icon" aria-hidden="true">▦</span>
+      <span class="history-month-copy">
+        <small>瀏覽月份</small>
+        <input id="historyMonthPicker" class="transaction-page-month" type="month" aria-label="選擇月份">
+      </span>
+    </label>
+
+    <div class="history-summary" aria-label="本月消費摘要">
+      <div class="history-summary-stat history-summary-count">
+        <small>消費紀錄</small>
+        <strong id="historyTxCount">0 筆</strong>
+      </div>
+      <span class="history-summary-divider" aria-hidden="true"></span>
+      <div class="history-summary-stat history-summary-total">
+        <small>本月總簽賬</small>
+        <strong id="historyTxTotal">$0</strong>
+      </div>
+    </div>
+  </section>
+
+  <div id="historyTxList" class="tx-list history-tx-list"></div>
 </div>
 
 <div id="bottomBar" class="bottom">
