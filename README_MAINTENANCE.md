@@ -64,3 +64,8 @@ History-only presentation rules live in:
 - `assets/css/history-refinements.css` — fixed history header integration, compact month control, and grouped monthly summary.
 
 The existing application IDs and JavaScript data flow are preserved (`historyBack`, `historyMonthPicker`, `historyTxCount`, `historyTxTotal`, `historyTxList`). The monthly selector and summary are grouped into a single compact control deck to conserve mobile vertical space.
+
+- `assets/css/notice-refinements.css` — W!bate toast/notice presentation and contrast overrides.
+
+## Home fixed header refinement
+`assets/css/home-header-fixed.css` is the final scoped override that keeps the main W!bate header fixed to the viewport. It deliberately contains no application logic.

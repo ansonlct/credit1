@@ -1,0 +1,93 @@
+/* ===== W!bate notice refinement =====
+   Keep notice semantics/JavaScript intact; only replace presentation.
+   Loaded after theme-wbate.css so generic .success/.warn colour helpers
+   cannot reduce toast text contrast. */
+
+.app-notice{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:48px;
+  padding:10px 14px 10px 10px!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  border-radius:17px!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,#4f46e5 0%,#6d3bea 52%,#8b2bd6 100%)!important;
+  box-shadow:
+    0 14px 34px rgba(74,55,190,.24),
+    0 4px 12px rgba(89,65,211,.12)!important;
+  font-size:13px!important;
+  font-weight:820!important;
+  letter-spacing:.005em;
+  text-shadow:0 1px 1px rgba(33,21,91,.16);
+  backdrop-filter:blur(18px) saturate(135%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(135%)!important;
+}
+
+.app-notice::before{
+  content:"!";
+  width:28px;
+  height:28px;
+  flex:0 0 28px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  color:#fff;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  font-size:14px;
+  font-weight:950;
+  line-height:1;
+}
+
+/* Success is intentionally brand-coloured instead of green. */
+.app-notice.success{
+  color:#fff!important;
+  background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 54%,#a21caf 100%)!important;
+  border-color:rgba(255,255,255,.24)!important;
+  box-shadow:
+    0 15px 38px rgba(97,56,196,.27),
+    0 5px 15px rgba(162,28,175,.12)!important;
+}
+.app-notice.success::before{
+  content:"✓";
+  background:rgba(255,255,255,.18);
+}
+
+/* Warning remains semantically warm, but uses a cleaner amber/orange tone. */
+.app-notice.warn{
+  color:#fff!important;
+  background:linear-gradient(135deg,#b45309 0%,#c2410c 55%,#be123c 100%)!important;
+  border-color:rgba(255,255,255,.22)!important;
+  box-shadow:
+    0 15px 36px rgba(180,83,9,.22),
+    0 5px 14px rgba(190,18,60,.10)!important;
+}
+.app-notice.warn::before{content:"!"}
+
+/* Default/error notice: W!bate pink-red, not muddy black/green. */
+.app-notice:not(.success):not(.warn){
+  color:#fff!important;
+  background:linear-gradient(135deg,#9d174d 0%,#be123c 54%,#c026d3 100%)!important;
+}
+.app-notice:not(.success):not(.warn)::before{content:"×"}
+
+@media(max-width:520px){
+  .app-notice{
+    top:max(12px,env(safe-area-inset-top));
+    width:max-content;
+    max-width:calc(100vw - 24px);
+    min-height:46px;
+    padding:9px 13px 9px 9px!important;
+    border-radius:16px!important;
+    font-size:12.5px!important;
+  }
+  .app-notice::before{
+    width:27px;height:27px;flex-basis:27px;border-radius:9px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .app-notice{transition-duration:.01ms!important}
+}

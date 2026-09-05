@@ -1,0 +1,33 @@
+/* ========================================================================== 
+   W!bate Home Header — hard fixed viewport positioning
+   Visual/layout only. No application logic lives here.
+   ========================================================================== */
+
+/* Keep the main W!bate header attached to the viewport, never to the document
+   flow. The explicit longhand positions intentionally override legacy .top
+   sticky rules in app.css/theme-wbate.css. */
+#mainApp > .app-brand-nav,
+#mainApp > .app-brand-nav.top{
+  position:fixed!important;
+  top:0!important;
+  right:0!important;
+  bottom:auto!important;
+  left:0!important;
+  z-index:100!important;
+  width:100%!important;
+  margin:0!important;
+  transform:none!important;
+  translate:none!important;
+}
+
+/* Reserve exactly the fixed header's footprint so the compact month / offer
+   row starts below it instead of sliding underneath it. */
+#mainApp.app-home{
+  padding-top:calc(var(--wb-nav-h) + 10px)!important;
+}
+
+@media(min-width:501px){
+  #mainApp.app-home{
+    padding-top:calc(var(--wb-nav-h) + 22px)!important;
+  }
+}
