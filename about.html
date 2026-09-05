@@ -14,12 +14,13 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="assets/css/about.css">
+<link rel="stylesheet" href="assets/css/navigation.css">
 </head>
-<body>
+<body data-page="about">
   <main class="brand-page">
     <nav class="brand-nav" aria-label="品牌介紹導覽">
-      <a class="back-link" href="index.html" aria-label="返回 W!bate 主頁">‹ <span>返回</span></a>
-      <a class="brand-mini" href="index.html" aria-label="W!bate 主頁">
+      <a class="back-link" href="index.html" aria-label="返回 W!bate 主頁" data-page-transition="back">‹ <span>返回</span></a>
+      <a class="brand-mini" href="index.html" aria-label="W!bate 主頁" data-page-transition="back">
         <img src="icons/icon-192x192.png" alt="" width="36" height="36">
         <strong>W!bate</strong>
       </a>
@@ -33,7 +34,7 @@
       <div class="eyebrow">EST. 2026.09</div>
       <h1>玩信用卡回贈，<br><span>可以更簡單。</span></h1>
       <p class="hero-lead">W!bate 是一個為熱衷信用卡回贈、迎新優惠及簽賬任務的玩家而設的工具，讓你更清楚知道每張卡差多少、何時到期，以及下一筆消費應該放在哪裡。</p>
-      <a class="primary-cta" href="index.html">開始使用 W!bate <span>→</span></a>
+      <a class="primary-cta" href="index.html" data-page-transition="back">開始使用 W!bate <span>→</span></a>
     </section>
 
     <section class="origin-section section-wrap">
@@ -107,8 +108,9 @@
 
     <footer>
       <p>W!bate 是獨立開發工具，並非銀行或信用卡發卡機構。信用卡優惠、條款及資格應以相關機構最新官方資料為準。</p>
-      <a href="index.html">返回 App</a>
+      <a href="index.html" data-page-transition="back">返回 App</a>
     </footer>
   </main>
+  <script src="assets/js/page-transitions.js"></script>
 </body>
 </html>

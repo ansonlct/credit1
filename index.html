@@ -25,18 +25,39 @@
 
 <link rel="stylesheet" href="assets/css/app.css">
 <link rel="stylesheet" href="assets/css/theme-wbate.css">
+<link rel="stylesheet" href="assets/css/navigation.css">
+<link rel="stylesheet" href="assets/css/home-refinements.css">
 </head>
 <body>
 <!-- Core layout stays in this file. Styles: assets/css/. App logic: assets/js/app.js. -->
 
-<div id="mainApp" class="app">
-  <div class="top">
-    <a class="title brand-link" href="about.html" aria-label="關於 W!bate">W!bate</a>
-    <div class="top-actions">
-      <input id="monthPicker" class="month" type="month">
-      <button id="settingsBtn" class="new-target-btn" aria-label="新增目標">＋ 新增優惠</button>
-    </div>
-  </div>
+<div id="mainApp" class="app app-home">
+  <nav class="brand-nav app-brand-nav top" aria-label="W!bate 主導覽">
+    <span class="nav-spacer nav-spacer-left" aria-hidden="true"></span>
+    <a class="brand-mini" href="about.html" aria-label="關於 W!bate" data-page-transition="forward">
+      <img src="icons/icon-192x192.png" alt="" width="36" height="36">
+      <strong>W!bate</strong>
+    </a>
+    <span class="nav-spacer" aria-hidden="true"></span>
+  </nav>
+
+  <section class="home-command-bar" aria-label="月份及優惠操作">
+    <label class="month-command" for="monthPicker">
+      <span class="command-icon" aria-hidden="true">▦</span>
+      <span class="command-copy">
+        <small>瀏覽月份</small>
+        <input id="monthPicker" class="month" type="month" aria-label="選擇月份">
+      </span>
+    </label>
+    <button id="settingsBtn" class="offer-command" type="button" aria-label="新增優惠">
+      <span class="offer-command-plus" aria-hidden="true">＋</span>
+      <span class="offer-command-copy">
+        <strong>新增優惠</strong>
+        <small>加入回贈／迎新目標</small>
+      </span>
+      <span class="offer-command-arrow" aria-hidden="true">→</span>
+    </button>
+  </section>
 
   <div class="section-head goal-section-head">
     <h2 id="goalSectionTitle">進行中的回贈目標 ( 0 個 )</h2>
@@ -58,7 +79,7 @@
 
   <div class="section-head history-head">
     <h2>消費紀錄</h2>
-    <div class="history-head-actions"><span id="txCount">0 筆</span><button id="viewMoreTx" class="history-more" type="button">查看更多</button></div>
+    <div class="history-head-actions"><span id="txCount">0 筆</span><button id="viewMoreTx" class="history-more" type="button" aria-label="查看全部消費紀錄" title="查看全部消費紀錄">查看更多</button></div>
   </div>
   <div id="txList" class="tx-list"></div>
 </div>
@@ -209,6 +230,7 @@
 </div>
 
 <script src="assets/js/app.js"></script>
+<script src="assets/js/page-transitions.js"></script>
 <datalist id="cardNameList">
 <option value="滙豐Red信用卡"></option>
 <option value="滙豐EveryMile信用卡"></option>

@@ -1,0 +1,205 @@
+/* ========================================================================== 
+   W!bate Home Refinements
+   - compact mobile month + add-offer toolbar
+   - transparent progress-mechanic shells
+   - equal-height goal cards
+   Visual-only overrides. No application logic lives here.
+   ========================================================================== */
+
+/* The spend/tier shell is only a positioning canvas. It must never render as
+   a coloured panel behind the actual progress bar. */
+#goals .spend-progress-shell,
+#goals .tier-progress-shell{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+
+/* Keep every goal/progress card visually aligned, regardless of mechanic.
+   188px safely accommodates standard, stamp, tier and threshold markers. */
+#goals .goal,
+#goals .goal:has(.stamp-progress-row),
+#goals .goal:has(.tier-progress-row),
+#goals .goal:has(.spend-progress-row){
+  height:188px!important;
+  min-height:188px!important;
+  max-height:188px!important;
+}
+
+/* Ensure the lower progress area owns the remaining space consistently. */
+#goals .goal-body{
+  height:100%;
+  min-height:0;
+}
+#goals .goal-lower{
+  margin-top:auto!important;
+  min-height:0;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile: a single compact action row. Month = filter, Add Offer = CTA.
+   This replaces the former two stacked 62px cards and saves ~70–80px.
+   -------------------------------------------------------------------------- */
+@media(max-width:500px){
+  .app-home{
+    padding-top:calc(var(--wb-nav-h) + 10px)!important;
+  }
+
+  .home-command-bar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)!important;
+    gap:7px!important;
+    margin:0 0 14px!important;
+    align-items:stretch;
+  }
+
+  .month-command,
+  .offer-command{
+    min-height:50px!important;
+    height:50px!important;
+    border-radius:16px!important;
+  }
+
+  .month-command{
+    grid-template-columns:31px minmax(0,1fr)!important;
+    gap:7px!important;
+    padding:7px 9px!important;
+    box-shadow:0 7px 20px rgba(56,64,151,.065)!important;
+  }
+
+  .command-icon{
+    width:31px!important;
+    height:31px!important;
+    border-radius:10px!important;
+    font-size:16px!important;
+  }
+
+  /* On phones the month value itself is the label; remove the redundant line. */
+  .month-command .command-copy small{
+    display:none!important;
+  }
+  .month-command .month{
+    font-size:13px!important;
+    font-weight:920!important;
+    line-height:1!important;
+    min-width:0!important;
+  }
+
+  .offer-command{
+    grid-template-columns:31px minmax(0,1fr)!important;
+    gap:7px!important;
+    padding:7px 10px!important;
+    box-shadow:0 9px 23px rgba(85,64,215,.20)!important;
+  }
+  .offer-command-plus{
+    width:31px!important;
+    height:31px!important;
+    border-radius:10px!important;
+    font-size:20px!important;
+  }
+  .offer-command-copy strong{
+    font-size:12.5px!important;
+    line-height:1.05!important;
+    white-space:nowrap;
+  }
+  .offer-command-copy small,
+  .offer-command-arrow{
+    display:none!important;
+  }
+
+  /* Equal height on phones too; one value avoids the previous 164/188/208px
+     jump between mechanics while remaining compact enough for the viewport. */
+  #goals .goal,
+  #goals .goal:has(.stamp-progress-row),
+  #goals .goal:has(.tier-progress-row),
+  #goals .goal:has(.spend-progress-row){
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
+
+@media(max-width:370px){
+  .home-command-bar{
+    grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)!important;
+    gap:6px!important;
+  }
+  .month-command,
+  .offer-command{
+    height:48px!important;
+    min-height:48px!important;
+  }
+  .month-command{padding-left:7px!important;padding-right:7px!important}
+  .offer-command{padding-left:7px!important;padding-right:8px!important}
+  .month-command .month{font-size:12px!important}
+  .offer-command-copy strong{font-size:11.8px!important}
+}
+
+/* ========================================================================== 
+   Compact navigation controls
+   - transaction history back = same visual language as Add Offer wizard back
+   - home "view all" = icon-only affordance while keeping accessible text
+   ========================================================================== */
+.transaction-page-back{
+  width:42px!important;
+  height:42px!important;
+  border:1px solid rgba(98,84,204,.09)!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#fff,#eeedff)!important;
+  color:#5c54cc!important;
+  box-shadow:0 6px 16px rgba(74,68,166,.09)!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:34px!important;
+  font-weight:500!important;
+  line-height:1!important;
+  padding:0 0 4px!important;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .14s ease,background .14s ease,box-shadow .14s ease!important;
+}
+.transaction-page-back:hover{
+  background:#e4e7eb!important;
+  transform:scale(1.03)!important;
+  box-shadow:0 8px 20px rgba(74,68,166,.12)!important;
+}
+.transaction-page-back:active{transform:scale(.96)!important}
+
+/* The JS can continue changing the hidden text between "查看更多" and "查看全部".
+   Visually the control stays a compact chevron icon; semantics remain available
+   through the button text + aria-label. */
+.history-more{
+  width:32px!important;
+  height:32px!important;
+  flex:0 0 32px!important;
+  padding:0!important;
+  border:1px solid rgba(98,84,204,.10)!important;
+  border-radius:11px!important;
+  background:linear-gradient(145deg,#fff,#f0efff)!important;
+  box-shadow:0 4px 12px rgba(74,68,166,.08)!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  font-size:0!important;
+  color:transparent!important;
+  text-decoration:none!important;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .14s ease,background .14s ease,box-shadow .14s ease!important;
+}
+.history-more::before{
+  content:"›";
+  display:block;
+  color:#5c54cc;
+  font-size:24px;
+  font-weight:800;
+  line-height:1;
+  transform:translateY(-1px);
+}
+.history-more:hover{
+  background:#fff!important;
+  transform:translateX(1px) scale(1.03)!important;
+  box-shadow:0 6px 16px rgba(74,68,166,.12)!important;
+  text-decoration:none!important;
+}
+.history-more:active{transform:scale(.95)!important}
