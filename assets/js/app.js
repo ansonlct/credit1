@@ -629,17 +629,17 @@ function getGoalRows(){
     const b=offerBounds(t),time=offerEndStatus(t,b),spent=spendForOffer(t,b);let title='',status='',progress=0,percent='0%',completed=false,meta=offerMeta(t),metaLines=homepageRequirementLines(t),stampCurrent=0,stampTarget=0,stampMilestones=[],stageOverview=null;
     if(t.mechanic==='tier_rate'){
       const tiers=[...t.tiers].sort((a,b)=>a.threshold-b.threshold),done=tiers.filter(x=>spent>=x.threshold),current=[...done].at(-1)||null,next=tiers.find(x=>spent<x.threshold),highestThreshold=Math.max(0,Number(tiers.at(-1)?.threshold||0)),capSpend=Math.max(0,Number(capAmounts(t).spend||0)),target=capSpend>0?capSpend:highestThreshold;
-      progress=target?pct(spent,target):(tiers.length?100:0);completed=tiers.length>0&&target>0&&spent>=target;
-      const nextIndex=next?tiers.indexOf(next)+1:tiers.length;
+      progress=target?pct(spent,target):(tiers.length?100:0);
+      /* 無簽賬上限代表優惠仍可繼續累積，不把最高門檻誤當成整個優惠的 100% 完成點。 */
+      completed=capSpend>0&&tiers.length>0&&spent>=capSpend;
       title=thresholdProgressTitle(t,done.length,tiers.length);
       metaLines=homepageTierRequirementLines(t);
       const estimatedRebate=tierEstimatedRebate(t,spent,current,b);
-      const estimateText=estimatedRebate===null?'':`；估算回贈 ${money(estimatedRebate)}`;
-      const capStatus=capSpend>0?(spent>=capSpend?'；已達簽賬上限':`；距離簽賬上限尚欠 ${money(Math.max(0,capSpend-spent))}`):'';
-      if(next){
-        const currentText=current?`；目前已解鎖 ${thresholdTierRewardLabel(current,t.thresholdRewardCategories)}`:'';
-        status=`已簽 ${money(spent)}，尚欠 ${money(Math.max(0,next.threshold-spent))}；門檻 ${nextIndex} 達標後 ${thresholdTierRewardLabel(next,t.thresholdRewardCategories)}${currentText}${estimateText}${capStatus}`;
-      }else status=`已簽 ${money(spent)}，全部 ${tiers.length} 個門檻已達標${current?`；最高門檻獎賞：${thresholdTierRewardLabel(current,t.thresholdRewardCategories)}`:''}${estimateText}${capStatus}`;
+      const statusParts=[`已簽 ${money(spent)}`];
+      if(next)statusParts.push(`尚欠 ${money(Math.max(0,next.threshold-spent))} 至下一門檻`);
+      if(capSpend>0)statusParts.push(spent>=capSpend?'已達簽賬上限':`尚餘額度 ${money(Math.max(0,capSpend-spent))}`);
+      if(estimatedRebate!==null)statusParts.push(`估算回贈 ${money(estimatedRebate)}`);
+      status=statusParts.join(' ‧ ');
     }else if(t.mechanic==='milestone'||t.mechanic==='custom'){
       const dated=t.targetType!=='welcome',ms=dated?[...t.milestones].sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||''))):[...t.milestones].sort((a,b)=>a.threshold-b.threshold);
       if(dated){
@@ -717,12 +717,17 @@ function getGoalRows(){
     }else{
       const req=Number(t.spendRequirement||0),rate=Number(t.rebateRate||0),caps=capAmounts(t);let target=req;
       if(caps.spend>0)target=caps.spend;
-      progress=target?pct(spent,target):(spent>0?100:0);completed=target>0&&spent>=target;
+      progress=target?pct(spent,target):(spent>0?100:0);
+      /* 沒有簽賬上限時，達到最低門檻只代表已進入回贈區間，不代表優惠已完結。 */
+      completed=caps.spend>0&&spent>=caps.spend;
       title=rebateProgressTitle(t,rate);
       metaLines=homepageRequirementLines(t);
       const est=spent>=req?spent*rate/100:0,capped=caps.reward>0?Math.min(est,caps.reward):est;
-      const capStatus=caps.spend>0?(spent>=caps.spend?'；已達簽賬上限':`；距離簽賬上限尚欠 ${money(Math.max(0,caps.spend-spent))}`):'';
-      status=spent<req?`已簽賬 ${money(spent)}，尚欠 ${money(req-spent)} 進入門檻${capStatus}`:`已簽賬 ${money(spent)}，估算回贈 ${money(capped)}${capStatus}`;
+      const statusParts=[`已簽賬 ${money(spent)}`];
+      if(spent<req)statusParts.push(`尚欠 ${money(Math.max(0,req-spent))} 進入門檻`);
+      if(caps.spend>0)statusParts.push(spent>=caps.spend?'已達簽賬上限':`尚餘額度 ${money(Math.max(0,caps.spend-spent))}`);
+      if(spent>=req)statusParts.push(`估算回贈 ${money(capped)}`);
+      status=statusParts.join(' ‧ ');
     }
     if(percent==='0%')percent=`${Math.round(progress)}%`;
     if(t.mechanic!=='standard'&&t.targetType!=='welcome'&&t.mechanic!=='stamp'&&t.mechanic!=='tier_rate')metaLines=[meta];
@@ -1032,11 +1037,12 @@ function renderTxTargetPicks(){
   const card=selectedTxCard(),box=document.getElementById('txTargetPicks'),summary=document.getElementById('txTargetSummary');if(!box||!summary)return;
   if(!card){box.innerHTML='';summary.className='tx-target-summary none';summary.textContent='';return}
   const category=document.getElementById('txCategory')?.value||'';
+  const date=document.getElementById('txDate')?.value||localDateStr();
   const targets=card.targets;
   if(!targets.length){box.innerHTML='';summary.className='tx-target-summary none';summary.textContent='此信用卡暫時未有目標';return}
   let hit=0;const preferredIds=Array.isArray(txInitialTargetIds)?txInitialTargetIds:null;
   box.innerHTML=targets.map(t=>{
-    const amount=parseFloat(document.getElementById('txAmount')?.value||0);const active=preferredIds?preferredIds.includes(t.id):targetAutoMatches(t,category,localDateStr(),amount);if(active)hit++;
+    const amount=parseFloat(document.getElementById('txAmount')?.value||0);const active=preferredIds?preferredIds.includes(t.id):targetAutoMatches(t,category,date,amount);if(active)hit++;
     return `<div class="target-pick ${t.targetType==='welcome'?'welcome':''} ${active?'active':''}" data-target-id="${t.id}" role="button" tabindex="0" aria-pressed="${active?'true':'false'}">
       <span class="target-dot"></span><span class="target-copy"><strong>${esc(targetShortLabel(t))}</strong><small>${esc(targetDetailLabel(t))}</small></span>
     </div>`;
@@ -1061,19 +1067,20 @@ let editingTransactionId=null,txInitialCategory=null,txInitialTargetIds=null;
 function resetTransactionEditor(){
   editingTransactionId=null;txInitialCategory=null;txInitialTargetIds=null;
   document.getElementById('addModal')?.classList.remove('is-editing');
-  const title=document.getElementById('addModalTitle'),confirm=document.getElementById('confirmAdd'),del=document.getElementById('deleteTx');
-  if(title)title.textContent='新增消費';if(confirm)confirm.textContent='新增消費';if(del)del.classList.add('hidden');
+  const title=document.getElementById('addModalTitle'),confirm=document.getElementById('confirmAdd'),del=document.getElementById('deleteTx'),dateInput=document.getElementById('txDate');
+  if(title)title.textContent='新增消費';if(confirm)confirm.textContent='新增消費';if(del)del.classList.add('hidden');if(dateInput)dateInput.value=localDateStr();
 }
 function openTransactionEditor(id=null){
-  const title=document.getElementById('addModalTitle'),confirm=document.getElementById('confirmAdd'),amountInput=document.getElementById('txAmount'),modal=document.getElementById('addModal'),del=document.getElementById('deleteTx');
+  const title=document.getElementById('addModalTitle'),confirm=document.getElementById('confirmAdd'),amountInput=document.getElementById('txAmount'),dateInput=document.getElementById('txDate'),modal=document.getElementById('addModal'),del=document.getElementById('deleteTx');
   if(id){
     const tx=state.transactions.find(t=>t.id===id);if(!tx)return;
     editingTransactionId=id;txInitialCategory=tx.category||'一般簽賬';txInitialTargetIds=[...(tx.targetIds||[])];
     if(title)title.textContent='修改消費';if(confirm)confirm.textContent='儲存修改';if(del)del.classList.remove('hidden');modal?.classList.add('is-editing');
+    if(dateInput)dateInput.value=tx.date||localDateStr();
     amountInput.value=String(Number(tx.amount||0));amountInput.style.width=`${Math.min(10,Math.max(1,amountInput.value.length||1))}ch`;
     openModal('addModal');requestAnimationFrame(()=>renderCardOptions(tx.cardKey));
   }else{
-    resetTransactionEditor();amountInput.value='';amountInput.style.width='1ch';
+    resetTransactionEditor();amountInput.value='';amountInput.style.width='1ch';if(dateInput)dateInput.value=localDateStr();
     openModal('addModal');requestAnimationFrame(()=>renderCardOptions());
   }
 }
@@ -1098,15 +1105,16 @@ document.getElementById('txAmount')?.addEventListener('input',e=>{
 });
 document.getElementById('txCard').addEventListener('change',renderTxCategories);
 document.getElementById('txCategory').addEventListener('change',renderTxTargetPicks);
+document.getElementById('txDate')?.addEventListener('change',renderTxTargetPicks);
 document.getElementById('confirmAdd').onclick=()=>{
-  const card=selectedTxCard(),amount=parseFloat(document.getElementById('txAmount').value),raw=document.getElementById('txCategory').value;
+  const card=selectedTxCard(),amount=parseFloat(document.getElementById('txAmount').value),raw=document.getElementById('txCategory').value,date=document.getElementById('txDate')?.value||'';
   if(!card){showNotice('請先新增及選擇信用卡優惠');return}
   if(!(amount>0)){showNotice('請輸入消費金額');return}
+  if(!date){showNotice('請選擇消費日期');return}
   const category=raw==='__other__'?'其他簽賬':raw;
   const selectedIds=[...document.querySelectorAll('#txTargetPicks .target-pick.active')].map(x=>x.dataset.targetId).filter(Boolean);
   const selectedTargets=selectedIds.map(id=>state.cards.find(t=>t.id===id)).filter(Boolean);
   const existing=editingTransactionId?state.transactions.find(t=>t.id===editingTransactionId):null;
-  const date=existing?.date||localDateStr();
   const record={
     id:existing?.id||uid(),cardKey:card.cardKey,cardName:card.name,amount,category,targetIds:selectedIds,
     targetRefs:selectedTargets.map(t=>({id:t.id,type:t.targetType,label:targetShortLabel(t)})),date,createdAt:existing?.createdAt||Date.now()
@@ -2279,8 +2287,11 @@ function v20ProgressMarker({pos,lane=0,title='',amount='',kind='',reached=false}
 }
 function v20RenderStandardProgress(target,row){
   const req=Math.max(0,Number(target?.spendRequirement||0)),capSpend=Math.max(0,Number(capAmounts(target).spend||0));
-  const scaleMax=capSpend>0?capSpend:(req>0?req:Math.max(1,Number(row?.progress||0)));
-  const spent=spendForOffer(target,offerBounds(target)),fill=scaleMax?pct(spent,scaleMax):Number(row.progress||0),percent=`${Math.round(fill)}%`;
+  const unlimited=capSpend<=0;
+  /* 無上限時把最低門檻放在約 82% 位置，留下明確的「仍可繼續」尾段。 */
+  const base=req>0?req:Math.max(1,spendForOffer(target,offerBounds(target))||1);
+  const scaleMax=capSpend>0?capSpend:base/.82;
+  const spent=spendForOffer(target,offerBounds(target)),fill=scaleMax?pct(spent,scaleMax):Number(row.progress||0),percent=unlimited?'∞':`${Math.round(fill)}%`;
   const specs=[];
   if(req>0){
     const p=Math.max(0,Math.min(100,req/scaleMax*100));
@@ -2288,17 +2299,18 @@ function v20RenderStandardProgress(target,row){
   }
   const lanes=v20MarkerLanes(specs.map(x=>x.pos),26);
   const markers=specs.map((x,i)=>v20ProgressMarker({...x,lane:lanes[i]})).join('');
-  if(!markers)return `<div class="goal-progress-row"><div class="progress"><div style="--target-width:${row.progress}%"></div></div><div class="goal-percent">${row.percent}</div></div>`;
-  return `<div class="spend-progress-row"><div class="spend-progress-shell"><div class="progress"><div style="--target-width:${fill}%"></div></div>${markers}</div><div class="goal-percent">${percent}</div></div>`;
+  if(!markers)return `<div class="goal-progress-row ${unlimited?'is-unlimited':''}"><div class="progress ${unlimited?'unlimited-progress':''}"><div style="--target-width:${fill}%"></div></div><div class="goal-percent ${unlimited?'goal-percent-infinite':''}">${percent}</div></div>`;
+  return `<div class="spend-progress-row ${unlimited?'is-unlimited':''}"><div class="spend-progress-shell"><div class="progress ${unlimited?'unlimited-progress':''}"><div style="--target-width:${fill}%"></div></div>${markers}</div><div class="goal-percent ${unlimited?'goal-percent-infinite':''}">${percent}</div></div>`;
 }
 function v19RenderTierProgress(target,row){
   const tiers=[...(target?.tiers||[])].filter(x=>Number(x.threshold||0)>0).sort((a,b)=>Number(a.threshold||0)-Number(b.threshold||0));
   if(!tiers.length)return v20RenderStandardProgress(target,row);
   const highestThreshold=Math.max(1,...tiers.map(x=>Number(x.threshold||0)));
   const capSpend=Math.max(0,Number(capAmounts(target).spend||0));
-  /* 有簽賬上限時，上限本身就是 100%。 */
-  const scaleMax=capSpend>0?capSpend:highestThreshold;
-  const spent=spendForOffer(target,offerBounds(target)),fill=pct(spent,scaleMax),percent=`${Math.round(fill)}%`;
+  const unlimited=capSpend<=0;
+  /* 無上限時最高門檻不是終點：放在 82%，右側保留無限延伸尾段。 */
+  const scaleMax=capSpend>0?capSpend:highestThreshold/.82;
+  const spent=spendForOffer(target,offerBounds(target)),fill=pct(spent,scaleMax),percent=unlimited?'∞':`${Math.round(fill)}%`;
   const specs=tiers.map((x,i)=>({
     pos:Math.max(0,Math.min(100,Number(x.threshold||0)/scaleMax*100)),
     title:v19TierMarkerReward(x),
@@ -2307,7 +2319,7 @@ function v19RenderTierProgress(target,row){
   specs.sort((a,b)=>a.pos-b.pos);
   const lanes=v20MarkerLanes(specs.map(x=>x.pos),14);
   const markers=specs.map((x,i)=>v20ProgressMarker({...x,lane:lanes[i]})).join('');
-  return `<div class="spend-progress-row tier-progress-row"><div class="spend-progress-shell tier-progress-shell"><div class="progress"><div style="--target-width:${fill}%"></div></div>${markers}</div><div class="goal-percent">${percent}</div></div>`;
+  return `<div class="spend-progress-row tier-progress-row ${unlimited?'is-unlimited':''}"><div class="spend-progress-shell tier-progress-shell"><div class="progress ${unlimited?'unlimited-progress':''}"><div style="--target-width:${fill}%"></div></div>${markers}</div><div class="goal-percent ${unlimited?'goal-percent-infinite':''}">${percent}</div></div>`;
 }
 renderGoals=function(){
   updateGoalSortControls();const rows=getGoalRows();const goalSectionTitle=document.getElementById('goalSectionTitle');if(goalSectionTitle)goalSectionTitle.textContent=`進行中的回贈目標 ( ${rows.length} 個 )`;const box=document.getElementById('goals');if(!rows.length){box.innerHTML='<div class="empty">未設定任何目標</div>';return}

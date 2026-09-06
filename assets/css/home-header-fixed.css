@@ -31,3 +31,8 @@
     padding-top:calc(var(--wb-nav-h) + 22px)!important;
   }
 }
+
+/* A persistent transform hint on #mainApp can make fixed descendants scroll
+   with that container in Safari/iOS. Keep the hint off during normal use. */
+#mainApp{will-change:auto!important}
+body.route-transitioning #mainApp{will-change:transform,opacity!important}

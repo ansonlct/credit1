@@ -246,3 +246,62 @@ body.wb-page-exit-back [data-page-transition="back"]{transform:translateX(-5px) 
   box-shadow:0 8px 20px rgba(74,68,166,.12)!important;
 }
 .brand-nav .back-link:active{transform:scale(.96)!important}
+
+/* Branded W!bate wordmark: shared by Home and About headers.
+   Keep the whole name as one youthful gradient wordmark: the ! is lettering,
+   not a separate neon badge. No underline or decorative star. */
+.brand-wordmark{
+  position:relative;
+  display:inline-flex;
+  align-items:baseline;
+  padding:2px 3px;
+  line-height:.9;
+  font-family:ui-rounded,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  font-size:21px;
+  font-weight:1000;
+  letter-spacing:-1.35px;
+  white-space:nowrap;
+  transform:rotate(-1deg) skewX(-3deg);
+  filter:drop-shadow(0 4px 10px rgba(92,72,229,.14));
+}
+.brand-wordmark::before,
+.brand-wordmark::after{content:none!important}
+.brand-wordmark-w,
+.brand-wordmark-bang,
+.brand-wordmark-bate{
+  position:relative;
+  display:inline-block;
+  z-index:1;
+  width:auto;
+  height:auto;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:linear-gradient(115deg,#168df6 0%,#5d52ff 38%,#9a43ee 66%,#ef48a6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-stroke:.3px rgba(255,255,255,.42);
+  text-shadow:0 1px 0 rgba(255,255,255,.42);
+  box-shadow:none;
+  font:inherit;
+  line-height:inherit;
+  letter-spacing:inherit;
+  transform:none;
+}
+.brand-wordmark-w{
+  font-size:1.18em;
+  letter-spacing:-1.8px;
+  transform:rotate(-2deg) translateY(.5px);
+}
+.brand-wordmark-bang{
+  margin:0 -.01em 0 -.03em;
+  font-size:1.02em;
+  letter-spacing:-1.4px;
+}
+.brand-wordmark-bate{letter-spacing:-1.25px}
+.brand-mini:hover .brand-wordmark{transform:rotate(-.2deg) skewX(-2deg) translateY(-1px)}
+
+@media(max-width:500px){
+  .brand-wordmark{font-size:20px}
+}
