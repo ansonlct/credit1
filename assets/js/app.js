@@ -416,6 +416,42 @@ function txForOffer(t,bounds=offerBounds(t)){
   return state.transactions.filter(tx=>txIncludesTarget(tx,t.id)&&dateInRange(tx.date,bounds.start,bounds.end));
 }
 function spendForOffer(t,bounds=offerBounds(t)){return txForOffer(t,bounds).reduce((s,tx)=>s+Number(tx.amount||0),0)}
+/* 瀏覽月份只顯示當月實際可能存在的優惠。
+   有明確開始日就以開始日為準；沒有開始日則以該優惠第一筆消費推斷，
+   再沒有消費才以優惠建立日期作保底，避免優惠無限延伸到過往月份。 */
+function firstOfferTransactionDate(t){
+  return state.transactions
+    .filter(tx=>txIncludesTarget(tx,t.id)&&/^\d{4}-\d{2}-\d{2}$/.test(String(tx.date||'')))
+    .map(tx=>String(tx.date).slice(0,10))
+    .sort()[0]||'';
+}
+function offerDisplayRange(t){
+  let start='',end='';
+  if(t.mechanic==='milestone'&&t.targetType!=='welcome'&&t.milestoneDateMode==='dated'){
+    const starts=(t.milestones||[]).map(x=>String(x.startDate||'').slice(0,10)).filter(Boolean).sort();
+    const ends=(t.milestones||[]).map(x=>String(x.endDate||'').slice(0,10)).filter(Boolean).sort();
+    start=starts[0]||'';end=ends.at(-1)||'';
+  }else if(t.periodType==='approval_window'){
+    start=String(t.approvalDate||'').slice(0,10);
+    end=start?addDays(start,t.welcomeDays):'';
+  }else{
+    start=String(t.startDate||'').slice(0,10);
+    end=String(t.endDate||t.rebateEndDate||'').slice(0,10);
+  }
+  if(!start)start=firstOfferTransactionDate(t);
+  if(!start&&Number(t.createdAt||0)>0){
+    const d=new Date(Number(t.createdAt));
+    if(!Number.isNaN(d.getTime()))start=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  }
+  return {start,end};
+}
+function offerVisibleInMonth(t,month=state.month){
+  if(!/^\d{4}-\d{2}$/.test(String(month||'')))return true;
+  const selectedStart=`${month}-01`,selectedEnd=monthEnd(month),range=offerDisplayRange(t);
+  if(range.start&&selectedEnd<range.start)return false;
+  if(range.end&&selectedStart>range.end)return false;
+  return true;
+}
 function campaignMonths(start,end){
   if(!start||!end)return [];
   const out=[],a=new Date(start+'T00:00:00'),b=new Date(end+'T00:00:00');a.setDate(1);
@@ -625,7 +661,7 @@ function tierEstimatedRebate(t,spent,current,bounds=offerBounds(t)){
 }
 function getGoalRows(){
   const rows=[];
-  state.cards.filter(t=>!t._temporary).forEach(t=>{
+  state.cards.filter(t=>!t._temporary&&offerVisibleInMonth(t)).forEach(t=>{
     const b=offerBounds(t),time=offerEndStatus(t,b),spent=spendForOffer(t,b);let title='',status='',progress=0,percent='0%',completed=false,meta=offerMeta(t),metaLines=homepageRequirementLines(t),stampCurrent=0,stampTarget=0,stampMilestones=[],stageOverview=null;
     if(t.mechanic==='tier_rate'){
       const tiers=[...t.tiers].sort((a,b)=>a.threshold-b.threshold),done=tiers.filter(x=>spent>=x.threshold),current=[...done].at(-1)||null,next=tiers.find(x=>spent<x.threshold),highestThreshold=Math.max(0,Number(tiers.at(-1)?.threshold||0)),capSpend=Math.max(0,Number(capAmounts(t).spend||0)),target=capSpend>0?capSpend:highestThreshold;

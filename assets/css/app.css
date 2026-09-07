@@ -823,6 +823,13 @@ button,label.switch,.offer-tab,.cat-chip,.target-pick,.tx{
 #settingsModal .wizard-head-back{font-size:34px;padding-bottom:4px}
 #settingsModal .wizard-head-back.is-hidden{opacity:0;pointer-events:none}
 #settingsModal .close:hover,#settingsModal .wizard-head-back:hover{background:#e4e7eb;transform:scale(1.03)}
+/* 新增／修改消費的 X 與新增優惠使用同一款關閉按鈕。 */
+#addModal .close{
+  width:42px;height:42px;border:0;border-radius:50%;background:#eceef2;color:#3e444c;
+  display:grid;place-items:center;font-size:25px;line-height:1;transition:.14s ease
+}
+#addModal .close:hover{background:#e4e7eb;transform:scale(1.03)}
+#addModal .close:active{transform:scale(.96)}
 #settingsCards{position:relative;height:calc(100dvh - 72px);overflow:hidden}
 .wizard-shell{
   position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;

@@ -433,7 +433,9 @@ input:focus,select:focus{
 .edit-row{border-bottom-color:rgba(96,92,184,.09)}
 .edit-label{color:#424a75}.edit-desc,.edit-note{color:#8087a6}
 .edit-pill{background:#f0f1ff!important;color:#676ec3!important}
-.edit-switch.on,.edit-yn-toggle .active{background:var(--wb-gradient)!important;color:#fff!important}
+.edit-switch.on{background:var(--wb-gradient)!important}
+/* Toggle 的「有／沒有」只用文字顏色表示狀態，不再以底色高亮。 */
+.edit-yn-toggle>span.active{background:transparent!important;color:#514bc7!important}
 
 /* Lists / rule builders / advanced screens -------------------------------- */
 .list-category-panel,.list-control-stack,.cap-type-block,.limit-fields,.linked-cap-fields,
