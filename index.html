@@ -30,11 +30,13 @@
 <link rel="stylesheet" href="assets/css/history-refinements.css">
 <link rel="stylesheet" href="assets/css/notice-refinements.css">
 <link rel="stylesheet" href="assets/css/home-header-fixed.css">
+<link rel="stylesheet" href="assets/css/professional-polish.css">
+<link rel="stylesheet" href="assets/css/home-redesign.css">
 </head>
 <body>
 <!-- Core layout stays in this file. Styles: assets/css/. App logic: assets/js/app.js. -->
 
-<div id="mainApp" class="app app-home">
+<main id="mainApp" class="app app-home">
   <nav class="brand-nav app-brand-nav top" aria-label="W!bate 主導覽">
     <span class="nav-spacer nav-spacer-left" aria-hidden="true"></span>
     <a class="brand-mini" href="about.html" aria-label="關於 W!bate" data-page-transition="forward">
@@ -44,50 +46,81 @@
     <span class="nav-spacer" aria-hidden="true"></span>
   </nav>
 
-  <section class="home-command-bar" aria-label="月份及優惠操作">
-    <label class="month-command" for="monthPicker">
-      <span class="command-icon" aria-hidden="true">▦</span>
-      <span class="command-copy">
-        <small>瀏覽月份</small>
-        <input id="monthPicker" class="month" type="month" aria-label="選擇月份">
-      </span>
-    </label>
-    <button id="settingsBtn" class="offer-command" type="button" aria-label="新增優惠">
-      <span class="offer-command-plus" aria-hidden="true">＋</span>
-      <span class="offer-command-copy">
-        <strong>新增優惠</strong>
-        <small>加入回贈／迎新目標</small>
-      </span>
-      <span class="offer-command-arrow" aria-hidden="true">→</span>
+  <section id="homeDashboard" class="home-dashboard is-compact" aria-labelledby="homeDashboardTitle">
+    <div id="homeDashboardDetails" class="home-dashboard-details" aria-hidden="true" inert>
+      <div class="home-dashboard-head">
+        <div class="home-dashboard-copy">
+          <h1 id="homeDashboardTitle">今個月，回贈點部署？</h1>
+        </div>
+      </div>
+
+      <div id="homeOverview" class="home-overview" aria-live="polite"></div>
+    </div>
+
+    <div class="home-dashboard-actions">
+      <label class="month-command" for="monthPicker">
+        <span class="command-icon" aria-hidden="true">▦</span>
+        <span class="command-copy">
+          <small>瀏覽月份</small>
+          <strong id="monthPickerDisplay" class="month-display" aria-hidden="true">----</strong>
+        </span>
+        <input id="monthPicker" class="month month-picker-hitarea" type="month" aria-label="選擇月份">
+      </label>
+
+      <button id="settingsBtn" class="offer-command" type="button" aria-label="新增信用卡優惠">
+        <span class="offer-command-plus" aria-hidden="true">＋</span>
+        <span class="offer-command-copy">
+          <strong>新增優惠</strong>
+          <small>回贈、迎新、階段及印花目標</small>
+        </span>
+        <span class="offer-command-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <button id="homeDashboardToggle" class="home-dashboard-toggle" type="button" aria-expanded="false" aria-controls="homeDashboardDetails" aria-label="打開每月回贈總覽" title="打開總覽">
+      <svg class="home-dashboard-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6.75 9.25 12 14.5l5.25-5.25" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </button>
   </section>
 
   <div class="section-head goal-section-head">
-    <h2 id="goalSectionTitle">進行中的回贈目標 ( 0 個 )</h2>
+    <h2 id="goalSectionTitle">目標追蹤 · 0 個</h2>
     <div class="goal-head-tools">
-      <label class="goal-sort-control" aria-label="回贈目標排序">
+      <div class="goal-sort-control" aria-label="回贈目標排序">
         <span class="goal-sort-label">排序</span>
-        <select id="goalSortSelect">
+        <button id="goalSortTrigger" class="goal-sort-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="goalSortMenu">
+          <span id="goalSortCurrent">依信用卡名稱</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m6.5 8 3.5 3.5L13.5 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="goalSortMenu" class="goal-sort-menu" role="listbox" aria-label="排序方式" hidden>
+          <button type="button" role="option" data-sort-value="card">依信用卡名稱</button>
+          <button type="button" role="option" data-sort-value="type">依簽賬類型</button>
+          <button type="button" role="option" data-sort-value="end">依結束時間</button>
+          <button type="button" role="option" data-sort-value="added">依加入時間</button>
+          <button type="button" role="option" data-sort-value="progress">依達標比例</button>
+        </div>
+        <select id="goalSortSelect" class="goal-sort-native" tabindex="-1" aria-hidden="true">
           <option value="card">依信用卡名稱</option>
           <option value="type">依簽賬類型</option>
           <option value="end">依結束時間</option>
           <option value="added">依加入時間</option>
           <option value="progress">依達標比例</option>
         </select>
-      </label>
+      </div>
       <button id="goalSortDir" class="goal-sort-dir" type="button" aria-label="切換排序方向" title="切換排序方向">↑</button>
     </div>
   </div>
   <div id="goals" class="goals"></div>
 
   <div class="section-head history-head">
-    <h2>消費紀錄</h2>
+    <h2>最近消費</h2>
     <div class="history-head-actions"><span id="txCount">0 筆</span><button id="viewMoreTx" class="history-more" type="button" aria-label="查看全部消費紀錄" title="查看全部消費紀錄">查看更多</button></div>
   </div>
   <div id="txList" class="tx-list"></div>
-</div>
+</main>
 
-<div id="transactionPage" class="app transaction-page hidden">
+<main id="transactionPage" class="app transaction-page hidden">
   <nav class="brand-nav transaction-brand-nav top" aria-label="消費紀錄導覽">
     <button id="historyBack" class="transaction-page-back" type="button" aria-label="返回主頁">‹</button>
     <div class="transaction-nav-title">消費紀錄</div>
@@ -117,17 +150,17 @@
   </section>
 
   <div id="historyTxList" class="tx-list history-tx-list"></div>
-</div>
+</main>
 
 <div id="bottomBar" class="bottom">
-  <button id="openAdd" class="add-btn">＋ 新增消費</button>
+  <button id="openAdd" class="add-btn" type="button">＋ 新增消費</button>
 </div>
 
-<div id="addModal" class="modal">
-  <div class="sheet">
+<div id="addModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle" aria-hidden="true">
+  <div class="sheet" tabindex="-1">
     <div class="sheet-head">
       <h3 id="addModalTitle">新增消費</h3>
-      <button class="close" data-close="addModal">×</button>
+      <button class="close" type="button" data-close="addModal" aria-label="關閉新增消費">×</button>
     </div>
 
 
@@ -143,7 +176,7 @@
         <div class="amount-caption">消費金額</div>
         <div class="amount-line">
           <span class="amount-currency">HK$</span>
-          <input id="txAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="消費金額">
+          <input id="txAmount" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0" aria-label="消費金額">
         </div>
       </div>
 
@@ -153,7 +186,7 @@
       </div>
 
       <div class="field">
-        <label>簽賬類別</label>
+        <label for="txCategory">簽賬類別</label>
         <select id="txCategory"></select>
       </div>
 
@@ -169,12 +202,12 @@
   </div>
 </div>
 
-<div id="settingsModal" class="modal">
-  <div class="sheet">
+<div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+  <div class="sheet" tabindex="-1">
     <div class="sheet-head wizard-full-head">
       <button id="wizardHeaderBack" class="wizard-head-back" type="button" aria-label="返回上一題" onclick="wizardBack()">‹</button>
       <h3 id="settingsTitle">優惠設定</h3>
-      <button class="close" data-close="settingsModal">×</button>
+      <button class="close" type="button" data-close="settingsModal" aria-label="關閉優惠設定">×</button>
     </div>
 
     <datalist id="cardNameSuggestions">
@@ -253,7 +286,7 @@
 
 <div id="appNotice" class="app-notice" role="status" aria-live="polite"></div>
 <div id="appConfirm" class="app-confirm-layer" aria-hidden="true">
-  <div class="app-confirm-card" role="dialog" aria-modal="true" aria-labelledby="appConfirmTitle">
+  <div class="app-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage">
     <div id="appConfirmTitle" class="app-confirm-title">確認操作</div>
     <div id="appConfirmMessage" class="app-confirm-message"></div>
     <div class="app-confirm-actions">

@@ -1,0 +1,775 @@
+/* W!bate home — consolidated production layer. */
+
+.app-home{width:min(100%,820px);overflow-anchor:none}
+.app-home::before{
+  content:"";
+  position:fixed;
+  inset:calc(var(--wb-nav-h) + env(safe-area-inset-top)) 0 auto;
+  height:240px;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0,rgba(111,76,255,.10),transparent 70%);
+}
+
+/* Monthly playbook: sticky, collapsible, and reduced to the two frequent actions. */
+.home-dashboard{
+  position:sticky;
+  top:calc(var(--wb-nav-h,64px) + env(safe-area-inset-top) + 8px);
+  z-index:24;
+  isolation:isolate;
+  overflow:hidden;
+  margin:0 0 28px;
+  padding:24px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 92% 4%,rgba(208,255,109,.16),transparent 29%),
+    radial-gradient(circle at 8% 100%,rgba(166,119,255,.30),transparent 38%),
+    linear-gradient(145deg,#19152e 0%,#2b1c5a 48%,#4c2db8 100%);
+  box-shadow:0 22px 50px rgba(42,28,105,.18);
+  transition:padding var(--duration-normal) var(--ease-standard),border-radius var(--duration-normal) var(--ease-standard),box-shadow var(--duration-normal) var(--ease-standard);
+}
+.home-dashboard.is-compact{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 38px;
+  align-items:center;
+  gap:8px;
+}
+.home-dashboard::after{
+  content:"";
+  position:absolute;
+  right:-115px;
+  bottom:-130px;
+  width:220px;
+  height:220px;
+  z-index:-1;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:50%;
+  box-shadow:0 0 0 34px rgba(255,255,255,.025),0 0 0 70px rgba(255,255,255,.018);
+}
+.home-dashboard-details{
+  max-height:900px;
+  opacity:1;
+  overflow:hidden;
+  transition:max-height var(--duration-slow) var(--ease-emphasized),opacity var(--duration-normal) var(--ease-standard),margin var(--duration-normal) var(--ease-standard);
+}
+.home-dashboard.is-compact{
+  padding:10px;
+  border-radius:20px;
+  box-shadow:0 14px 34px rgba(31,20,84,.20);
+}
+.home-dashboard.is-compact .home-dashboard-details{display:none;max-height:0;opacity:0;visibility:hidden;margin:0}
+.home-dashboard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px;padding-right:42px}
+.home-dashboard-copy{min-width:0}
+.home-eyebrow{display:block;margin-bottom:6px;color:#cfff71;font-size:.75rem;font-weight:760;letter-spacing:.12em}
+.home-dashboard h1{max-width:500px;margin:0;color:#fff;font-size:clamp(1.6rem,5vw,2.15rem);font-weight:720;line-height:1.18;letter-spacing:-.045em}
+.home-dashboard-toggle{
+  position:absolute;
+  top:16px;
+  right:16px;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  min-width:38px;
+  min-height:38px;
+  padding:0;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:13px;
+  background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.09));
+  color:#fff;
+  line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 5px 14px rgba(15,10,46,.16);
+  transition:background var(--duration-fast) var(--ease-standard),transform var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard);
+}
+.home-dashboard-toggle-icon{width:18px;height:18px;transform:rotate(180deg);transition:transform var(--duration-normal) var(--ease-emphasized)}
+.home-dashboard-toggle:hover{background:linear-gradient(145deg,rgba(255,255,255,.26),rgba(255,255,255,.13));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 7px 18px rgba(15,10,46,.20)}
+.home-dashboard-toggle:active{transform:scale(.94)}
+.home-dashboard.is-compact .home-dashboard-toggle{position:static;grid-column:2;grid-row:1;width:38px;height:38px;min-width:38px;min-height:38px;justify-self:end}
+.home-dashboard.is-compact .home-dashboard-toggle-icon{transform:rotate(0deg)}
+
+.home-overview-meta{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;color:rgba(255,255,255,.64);font-size:.78rem;font-weight:540}
+.home-overview-meta span:last-child{text-align:right}
+.home-stats{display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.home-stat{min-width:0;padding:12px 13px;border:1px solid rgba(255,255,255,.11);border-radius:15px;background:rgba(255,255,255,.07)}
+.home-stat span{display:block;margin-bottom:3px;color:rgba(255,255,255,.57);font-size:.75rem;font-weight:540}
+.home-stat strong{display:block;overflow:hidden;color:#fff;font-size:1.12rem;font-weight:690;line-height:1.2;letter-spacing:-.025em;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.home-stat:first-child strong{font-size:1.28rem}
+
+.home-focus-panel{padding:12px;border:1px solid rgba(255,255,255,.15);border-radius:20px;background:rgba(255,255,255,.07)}
+.home-focus-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 9px}
+.home-focus-heading strong{color:#fff;font-size:.82rem;font-weight:680}
+.home-focus-heading span{min-width:42px;padding:3px 8px;border-radius:999px;background:rgba(207,255,113,.13);color:#d9ff94;font-size:.75rem;font-weight:680;text-align:center;font-variant-numeric:tabular-nums}
+.home-focus-list{display:grid;gap:8px}
+.home-focus{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;min-height:94px;padding:12px 12px 11px 14px;border:1px solid rgba(255,255,255,.15);border-radius:15px;background:rgba(255,255,255,.085)}
+.home-focus.is-empty{grid-template-columns:1fr;min-height:76px}
+.home-focus-main{min-width:0}
+.home-focus-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px}
+.home-focus-label{display:inline-flex;align-items:center;gap:5px;color:#d6ff86;font-size:.75rem;font-weight:720;letter-spacing:.025em}
+.home-focus-label::before{content:"";width:6px;height:6px;border-radius:50%;background:#cfff71;box-shadow:0 0 0 4px rgba(207,255,113,.09)}
+.home-focus-deadline{color:rgba(255,255,255,.70);font-size:.75rem;font-weight:570;white-space:nowrap}
+.home-focus strong{display:block;overflow:hidden;color:#fff;font-size:.95rem;font-weight:680;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
+.home-focus p{margin:4px 0 9px;color:rgba(255,255,255,.67);font-size:.78rem;font-weight:450;line-height:1.45}
+.home-focus.is-empty p{margin-bottom:0}
+.home-focus-progress{height:5px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.14)}
+.home-focus-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#cfff71,#77efd2);transition:width var(--duration-slow) var(--ease-emphasized)}
+.home-focus-action{width:48px;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:15px;background:#fff;color:#3c258c;font-size:.8rem;font-weight:700;box-shadow:0 8px 18px rgba(17,11,49,.18);transition:transform var(--duration-fast) var(--ease-standard),background var(--duration-fast) var(--ease-standard)}
+.home-focus-action:hover{background:#f4ffe0}
+.home-focus-action:active{transform:scale(.96)}
+
+.home-dashboard-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:10px;transition:margin var(--duration-normal) var(--ease-standard)}
+.home-dashboard.is-compact .home-dashboard-actions{grid-column:1;grid-row:1;width:100%;min-width:0;margin-top:0;padding-right:0}
+.home-dashboard .month-command,.home-dashboard .offer-command{width:100%!important;height:52px!important;min-height:52px!important;margin:0!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:16px!important;box-shadow:none!important}
+.home-dashboard .month-command{grid-template-columns:34px minmax(0,1fr)!important;gap:8px!important;padding:8px 10px!important;background:rgba(255,255,255,.10)!important;color:#fff}
+.home-dashboard .month-command:hover{background:rgba(255,255,255,.15)!important;border-color:rgba(255,255,255,.24)!important}
+.home-dashboard .command-icon{width:34px!important;height:34px!important;border-radius:11px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;box-shadow:none!important}
+.home-dashboard .command-copy small{color:rgba(255,255,255,.60)!important;font-size:.75rem;font-weight:550}
+.home-dashboard .month{color:#fff!important;font-size:.82rem!important;font-weight:650!important;color-scheme:dark}
+.home-dashboard .month::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.7}
+.home-dashboard .offer-command{background:rgba(255,255,255,.95)!important;color:#342175!important}
+.home-dashboard .offer-command:hover{background:#fff!important}
+.home-dashboard .offer-command-plus{width:34px;height:34px;border:0;border-radius:11px;background:#eee9ff;color:#6042df;box-shadow:none}
+.home-dashboard .offer-command-copy strong{color:#2a1b67;font-size:.84rem;font-weight:700}
+.home-dashboard .offer-command-copy small{color:#716891;font-size:.75rem;font-weight:500}
+.home-dashboard .offer-command-arrow{color:#6346dc}
+
+/* Goal tools and scan-friendly card feed. */
+.app-home .goal-section-head{margin-bottom:10px}
+.app-home .goal-section-head h2{font-size:1.06rem;font-weight:720}
+.app-home .goal-head-tools{flex:0 1 auto}
+.app-home .goals{display:grid;grid-auto-rows:auto;align-items:stretch;gap:11px;overflow:visible;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#goals .goal{
+  --bar-start:#6848e8!important;
+  --bar-end:#8b70ff!important;
+  --bar-glow:rgba(104,72,232,.18)!important;
+  --theme-soft:rgba(104,72,232,.055)!important;
+  --theme-fade:rgba(139,112,255,.025)!important;
+  --theme-soft-hover:rgba(104,72,232,.075)!important;
+  --theme-fade-hover:rgba(139,112,255,.035)!important;
+  position:relative;
+  overflow:hidden;
+  height:auto;
+  min-height:176px!important;
+  max-height:none!important;
+  margin:0!important;
+  border:1px solid var(--wb-border)!important;
+  border-radius:21px;
+  background:#fff!important;
+  box-shadow:0 7px 22px rgba(35,29,78,.055);
+  transition:border-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard)!important;
+}
+#goals .goal:hover{border-color:rgba(89,65,201,.18)!important;box-shadow:0 9px 25px rgba(35,29,78,.07)}
+#goals .goal::before{top:0;bottom:0;left:0;width:4px;border-radius:0;background:linear-gradient(180deg,#6848e8,#8b70ff)!important;box-shadow:none!important}
+#goals .goal.completed::before{background:linear-gradient(180deg,#168b6b,#4fc6a0)!important}
+#goals .goal.is-priority{border-color:rgba(104,72,232,.28)!important;box-shadow:0 9px 28px rgba(81,55,178,.09)!important}
+#goals .goal.is-priority-focus{animation:homeGoalFocus .75s var(--ease-emphasized) both}
+@keyframes homeGoalFocus{40%{transform:scale(1.012);box-shadow:0 14px 34px rgba(91,61,198,.17)}100%{transform:none}}
+#goals .goal-body{height:auto!important;min-height:0!important;overflow:visible!important;transition:padding-right var(--duration-fast) var(--ease-standard)}
+#goals .goal.open .goal-body{padding-right:48px}
+#goals .goal-card{display:flex;align-items:center;gap:6px;margin-bottom:4px;padding-right:106px!important;color:var(--wb-text-secondary)!important;font-size:.78rem;font-weight:600!important;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+#goals .goal-title{display:flex;align-items:flex-start;gap:7px;min-width:0;margin-bottom:5px;padding-right:0!important;color:var(--wb-text)!important;font-size:.98rem;font-weight:720!important;line-height:1.35;letter-spacing:-.012em;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere}
+#goals .goal-days{position:absolute;top:12px;right:12px;z-index:4;margin:0;white-space:nowrap}
+.goal-priority-badge{flex:none;padding:2px 6px;border-radius:999px;background:#f0edff;color:#6042d6;font-size:.75rem;font-weight:700;line-height:1.3}
+#goals .goal-meta{max-height:none!important;margin:0 0 10px!important;color:var(--wb-text-secondary)!important;font-size:.75rem;line-height:1.48;white-space:normal!important;overflow:visible!important}
+#goals .goal-meta-line{display:block;max-width:100%;font-weight:480;line-height:1.48!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere}
+#goals .goal-meta b{color:var(--wb-text);font-weight:680}
+#goals .goal-lower{min-width:0;margin-top:10px!important}
+#goals .goal-status{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;margin-top:8px!important;padding:0 0 1px!important;color:var(--wb-text-secondary)!important;font-size:.77rem;line-height:1.42!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.goal-status-item{color:var(--wb-text-secondary)}
+.goal-status-item+.goal-status-item::before{content:"·";margin-right:8px;color:#b2b0bd}
+.goal-status-item.is-action{color:#563bc7;font-weight:650}
+.goal-status-item.is-reward{color:#087a60;font-weight:620}
+
+/* Goal actions are click-revealed only. Hidden actions never consume card width. */
+#goals .goal-actions{position:absolute;top:50px;right:12px;z-index:7;display:flex;flex-direction:column;gap:6px;opacity:0;visibility:hidden;transform:translateX(8px);pointer-events:none;transition:opacity var(--duration-fast) var(--ease-standard),transform var(--duration-fast) var(--ease-standard),visibility 0s linear var(--duration-fast)}
+#goals .goal.open .goal-actions,#goals .goal:focus-within .goal-actions{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition-delay:0s}
+#goals .goal-action{display:grid;place-items:center;width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border:0;border-radius:13px;background:#f1eff9;color:#5d46c9;font-size:1.05rem;line-height:1;box-shadow:0 5px 15px rgba(40,29,92,.08)}
+#goals .goal-priority-toggle[aria-pressed="true"]{background:#6848e8;color:#fff}
+#goals .goal .goal-modify{position:static!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:0!important;opacity:1!important;transform:none!important;pointer-events:auto!important;background:#f1eff9!important;color:#5d46c9!important}
+
+/* Recent activity. */
+.app-home .history-head{margin-top:30px}
+.app-home .tx-list{display:grid;gap:8px;overflow:visible;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.app-home .tx{border:1px solid var(--wb-border)!important;border-radius:17px;background:#fff!important;box-shadow:0 4px 16px rgba(35,29,78,.04)}
+.app-home .tx:hover{background:#fbfaff!important}
+.app-home .empty{border:1px dashed rgba(71,57,143,.17);border-radius:20px!important;box-shadow:none!important}
+
+@media(max-width:600px){
+  .home-dashboard{top:calc(var(--wb-nav-h,64px) + env(safe-area-inset-top) + 5px);margin-inline:-2px;padding:19px;border-radius:24px;box-shadow:0 16px 38px rgba(42,28,105,.16)}
+  .home-dashboard.is-compact{padding:8px}
+  .home-dashboard-head{margin-bottom:16px}
+  .home-dashboard h1{font-size:1.58rem}
+  .home-stats{grid-template-columns:1.35fr 1fr 1fr}
+  .home-stat{padding:10px}
+  .home-stat strong{font-size:1rem}
+  .home-stat:first-child strong{font-size:1.13rem}
+  .home-dashboard-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .home-dashboard.is-compact .home-dashboard-actions{padding-right:0}
+  .home-dashboard .month-command .command-copy{min-width:0}
+  .home-dashboard .month{width:100%;min-width:0;font-size:.77rem!important}
+  .home-dashboard .offer-command-copy small,.home-dashboard .offer-command-arrow{display:none!important}
+  .app-home .goal-section-head{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;align-items:stretch!important}
+  .app-home .goal-head-tools{display:grid!important;grid-template-columns:minmax(0,1fr) 40px;width:100%!important;gap:7px!important}
+  .app-home .goal-sort-control{width:100%!important;max-width:none!important;min-width:0!important;height:40px!important}
+  .app-home .goal-sort-label{display:inline!important}
+  .app-home .goal-sort-dir{width:40px!important;height:40px!important;min-width:40px!important;flex-basis:40px!important}
+}
+
+@media(max-width:430px){
+  .home-dashboard{padding:17px;margin-bottom:24px}
+  .home-dashboard.is-compact{padding:8px}
+  .home-eyebrow{letter-spacing:.09em}
+  .home-dashboard h1{font-size:1.42rem}
+  .home-overview-meta{font-size:.75rem}
+  .home-stat{padding:9px 8px}
+  .home-stat strong,.home-stat:first-child strong{font-size:.98rem}
+  .home-focus-panel{padding:10px}
+  .home-focus{grid-template-columns:minmax(0,1fr) 44px;gap:10px;min-height:96px;padding:13px}
+  .home-focus.is-empty{grid-template-columns:1fr}
+  .home-focus strong{font-size:.88rem}
+  .home-focus p{font-size:.75rem}
+  .home-focus-action{width:44px;height:44px;border-radius:13px;font-size:.75rem}
+  .home-dashboard .month-command,.home-dashboard .offer-command{height:48px!important;min-height:48px!important}
+  .home-dashboard .month-command{grid-template-columns:30px minmax(0,1fr)!important;padding:6px 7px!important}
+  .home-dashboard .command-icon,.home-dashboard .offer-command-plus{width:30px!important;height:30px!important}
+  .home-dashboard .command-copy small{font-size:.75rem}
+  .home-dashboard .month{font-size:.75rem!important}
+  .home-dashboard .offer-command-copy strong{font-size:.78rem}
+  #goals .goal{min-height:176px!important}
+  #goals .goal-card{padding-right:96px!important}
+}
+
+@media(max-width:370px){
+  .home-dashboard-actions{gap:6px}
+  .home-dashboard.is-compact .home-dashboard-actions{padding-right:0}
+  .home-dashboard .month-command{grid-template-columns:28px minmax(0,1fr)!important;padding-inline:6px!important}
+  .home-dashboard .command-icon,.home-dashboard .offer-command-plus{width:28px!important;height:28px!important}
+  .home-dashboard .offer-command{padding-inline:7px!important}
+  .home-dashboard .month{font-size:.75rem!important}
+  .home-stats{grid-template-columns:1fr 1fr 1fr}
+  .home-stat{padding:8px 7px}
+  .home-stat strong,.home-stat:first-child strong{font-size:.88rem}
+  .home-focus-deadline{display:none}
+}
+
+@media(min-width:900px){
+  .home-dashboard{padding:28px}
+  .home-dashboard.is-compact{padding:10px}
+  .home-stats{grid-template-columns:1.6fr 1fr 1fr}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .home-dashboard,.home-dashboard-details,.home-dashboard-actions,.home-dashboard-toggle,.home-dashboard-toggle-icon,#goals .goal-actions{transition:none!important}
+  #goals .goal.is-priority-focus{animation:none!important}
+  .home-focus-progress span{transition:none}
+}
+
+/* ===== production follow-up: compact month alignment, coloured add button, scroll reveal, pulse ===== */
+/* Keep the month copy visually stable across browsers: the native month input is only the hit area. */
+.home-dashboard .month-command{
+  position:relative!important;
+  display:grid!important;
+  align-items:center!important;
+}
+.home-dashboard .month-command .command-copy{
+  display:flex!important;
+  min-width:0!important;
+  height:34px!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  gap:2px!important;
+  line-height:1!important;
+  transform:none!important;
+}
+.home-dashboard .month-command .command-copy small{
+  display:block!important;
+  margin:0!important;
+  line-height:1.05!important;
+}
+.home-dashboard .month-display{
+  display:block;
+  width:100%;
+  margin:0;
+  overflow:hidden;
+  color:#fff;
+  font-size:.82rem;
+  font-weight:700;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.home-dashboard .month-picker-hitarea{
+  position:absolute!important;
+  inset:0!important;
+  z-index:5!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  opacity:0!important;
+  cursor:pointer!important;
+}
+
+/* 新增優惠用品牌紫漸層，compact 狀態仍有清晰主次。 */
+.home-dashboard .offer-command{
+  border-color:rgba(255,255,255,.22)!important;
+  background:linear-gradient(118deg,#6d4df2 0%,#7659f5 52%,#8c65f6 100%)!important;
+  color:#fff!important;
+  box-shadow:0 8px 18px rgba(49,28,138,.24)!important;
+}
+.home-dashboard .offer-command:hover{
+  background:linear-gradient(118deg,#7658f7 0%,#8062f8 52%,#966ff8 100%)!important;
+  box-shadow:0 10px 22px rgba(49,28,138,.30)!important;
+}
+.home-dashboard .offer-command-plus{
+  border:1px solid rgba(255,255,255,.20)!important;
+  background:rgba(255,255,255,.16)!important;
+  color:#fff!important;
+}
+.home-dashboard .offer-command-copy strong{color:#fff!important}
+.home-dashboard .offer-command-copy small{color:rgba(255,255,255,.74)!important}
+.home-dashboard .offer-command-arrow{color:#fff!important}
+
+/* Compact details stay in the DOM so returning to page top can open smoothly without flashing. */
+.home-dashboard-details{
+  transform:translateY(0);
+  transform-origin:top center;
+  will-change:max-height,opacity,transform;
+}
+.home-dashboard.is-compact .home-dashboard-details{
+  display:block!important;
+  max-height:0!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transform:translateY(-8px);
+  margin:0!important;
+}
+.home-dashboard.is-slow-expanding .home-dashboard-details{
+  transition:max-height .72s cubic-bezier(.22,.72,.18,1),opacity .52s ease .10s,transform .72s cubic-bezier(.22,.72,.18,1),margin .52s ease!important;
+}
+.home-dashboard.is-slow-expanding{
+  transition:padding .72s cubic-bezier(.22,.72,.18,1),border-radius .62s ease,box-shadow .62s ease!important;
+}
+
+/* 階段目標 requirements 合併成一個 meta row；窄螢幕容許自然換行，但不再逐項獨立一行。 */
+#goals .goal[data-mechanic="milestone"] .goal-meta-line,
+#goals .goal[data-mechanic="custom"] .goal-meta-line{display:inline}
+
+/* Restore a visible electric pulse even when progress is only a few percent wide. */
+#goals .progress>div{
+  isolation:isolate;
+  animation:progressGrow .82s cubic-bezier(.22,.78,.24,1) both,
+            wbElectricPulse 5.4s ease-in-out calc(var(--bar-delay,0ms) + 1.05s) infinite!important;
+}
+#goals .progress>div::after{
+  content:""!important;
+  position:absolute!important;
+  top:-45%!important;
+  bottom:-45%!important;
+  left:-44px!important;
+  width:44px!important;
+  height:auto!important;
+  margin:0!important;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.14) 20%,rgba(255,255,255,.98) 50%,rgba(255,255,255,.20) 78%,transparent 100%)!important;
+  filter:blur(.2px);
+  opacity:0;
+  transform:skewX(-18deg);
+  will-change:left,opacity;
+  animation:wbElectricSweep 5.4s cubic-bezier(.22,.72,.18,1) calc(var(--bar-delay,0ms) + 1.05s) infinite!important;
+}
+@keyframes wbElectricSweep{
+  0%,20%{left:-44px;opacity:0}
+  25%{opacity:.95}
+  43%{left:calc(100% + 8px);opacity:.78}
+  50%,100%{left:calc(100% + 44px);opacity:0}
+}
+@keyframes wbElectricPulse{
+  0%,19%,52%,100%{filter:saturate(1);box-shadow:0 0 8px var(--bar-glow,rgba(89,103,255,.17))}
+  28%{filter:saturate(1.16) brightness(1.08);box-shadow:0 0 18px var(--bar-glow,rgba(89,103,255,.38)),0 0 5px rgba(255,255,255,.30)}
+  42%{filter:saturate(1.05);box-shadow:0 0 11px var(--bar-glow,rgba(89,103,255,.24))}
+}
+
+@media(max-width:430px){
+  .home-dashboard .month-command .command-copy{height:30px!important;gap:1px!important}
+  .home-dashboard .month-display{font-size:.75rem}
+}
+@media(prefers-reduced-motion:reduce){
+  #goals .progress>div,#goals .progress>div::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .home-dashboard.is-slow-expanding,.home-dashboard.is-slow-expanding .home-dashboard-details{transition:none!important}
+}
+
+
+/* ===== production follow-up v3: softer action, pull-to-open, compact cards/editor ===== */
+/* 「新增優惠」保留可按性，但色調貼近 playbook 本身的紫色背景。 */
+.home-dashboard .offer-command{
+  border-color:rgba(255,255,255,.18)!important;
+  background:linear-gradient(118deg,rgba(118,86,205,.72) 0%,rgba(126,91,218,.76) 54%,rgba(137,99,224,.72) 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 7px 16px rgba(31,18,92,.16)!important;
+}
+.home-dashboard .offer-command:hover{
+  background:linear-gradient(118deg,rgba(126,94,214,.78) 0%,rgba(136,100,226,.80) 54%,rgba(147,108,231,.77) 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 18px rgba(31,18,92,.20)!important;
+}
+.home-dashboard .offer-command-plus{
+  background:rgba(255,255,255,.13)!important;
+  border-color:rgba(255,255,255,.16)!important;
+}
+
+/* 回到頁頂後仍需再拉少少才打開；未達門檻時提供輕微阻力／回彈視覺。 */
+.home-dashboard.is-compact.is-top-pulling{
+  transform:translateY(calc(var(--home-top-pull,0) * 4px));
+  box-shadow:0 calc(14px + (var(--home-top-pull,0) * 5px)) calc(34px + (var(--home-top-pull,0) * 8px)) rgba(31,20,84,.22);
+}
+.home-dashboard.is-compact.is-top-pulling .home-dashboard-toggle-icon{
+  transform:rotate(calc(var(--home-top-pull,0) * 42deg)) scale(calc(1 + (var(--home-top-pull,0) * .08)));
+}
+.home-dashboard.is-pull-releasing{
+  transition:padding .22s var(--ease-standard),border-radius .22s var(--ease-standard),box-shadow .22s var(--ease-standard),transform .22s cubic-bezier(.22,.72,.18,1)!important;
+}
+
+/* 卡片保持等高邏輯，但取消舊版本 180–208px 的硬性高度；以實際內容最高一張為準。 */
+#goals .goal,
+#goals .goal:has(.stamp-progress-row),
+#goals .goal:has(.tier-progress-row),
+#goals .goal:has(.spend-progress-row){
+  height:auto!important;
+  min-height:148px!important;
+  padding-top:9px!important;
+  padding-bottom:8px!important;
+}
+#goals .goal-card{margin-bottom:2px!important}
+#goals .goal-title{margin-bottom:3px!important}
+#goals .goal-meta{margin-bottom:4px!important;line-height:1.36!important}
+#goals .goal-status{margin-top:5px!important;line-height:1.34!important}
+
+/* 有門檻標記的進度區縮短，不再因 80px shell 把全組卡片拉高。 */
+#goals .spend-progress-shell,
+#goals .tier-progress-shell{height:64px!important}
+#goals .spend-progress-shell .progress,
+#goals .tier-progress-shell .progress{top:32px!important}
+#goals .spend-progress-marker{top:39.5px!important}
+#goals .spend-progress-marker.lane-0::before{height:29px!important}
+#goals .spend-progress-marker.lane-1::before{height:42px!important}
+#goals .spend-progress-marker.lane-2::before{height:54px!important}
+#goals .spend-progress-marker.lane-0 .spend-marker-title{bottom:18px!important}
+#goals .spend-progress-marker.lane-1 .spend-marker-title{bottom:31px!important}
+#goals .spend-progress-marker.lane-2 .spend-marker-title{bottom:43px!important}
+#goals .spend-progress-marker .spend-marker-amount{top:11px!important}
+#goals .spend-progress-row .goal-percent{margin-top:31px!important}
+
+/* 階段要求明確固定兩行：第一行計算方式／最低簽賬；第二行上限／完成獎賞。 */
+#goals .goal[data-mechanic="milestone"] .goal-meta-line,
+#goals .goal[data-mechanic="custom"] .goal-meta-line{
+  display:block!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+/* 新增消費：不再強制接近全屏；內容壓縮，命中目標每行兩個。 */
+#addModal .sheet{
+  height:auto!important;
+  max-height:min(90vh,860px)!important;
+  max-height:min(90dvh,860px)!important;
+}
+#addModal .sheet-head{padding:12px 14px 9px!important}
+#addModal .tx-editor-body{padding:0 14px 8px!important}
+#addModal .tx-card-carousel-field{margin-bottom:2px!important}
+#addModal .tx-card-carousel{
+  --wallet-card-w:min(66vw,268px);
+  gap:9px;
+  padding-top:3px;
+  padding-bottom:8px;
+}
+#addModal .tx-wallet-card{
+  height:142px;
+  padding:15px 17px 13px;
+  border-radius:18px;
+}
+#addModal .tx-wallet-name{font-size:17px}
+#addModal .amount-entry{margin:0 0 9px!important;padding:7px 10px 9px!important}
+#addModal .amount-caption{margin-bottom:1px}
+#addModal .amount-line{min-height:55px}
+#addModal .amount-currency{font-size:24px;letter-spacing:-.7px}
+#addModal #txAmount{font-size:50px;letter-spacing:-2.4px}
+#addModal .field{margin-bottom:8px}
+#addModal .field label{margin-bottom:4px}
+#addModal input,#addModal select{padding:9px 10px}
+#addModal .target-label{margin:1px 0 5px}
+#addModal .multi-target-picks{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-auto-rows:auto!important;
+  gap:7px!important;
+  margin-bottom:5px!important;
+}
+#addModal .multi-target-picks .target-pick{
+  width:100%;
+  height:auto!important;
+  min-height:58px!important;
+  max-height:none!important;
+  padding:8px 9px!important;
+  align-items:flex-start;
+  gap:7px;
+}
+#addModal .multi-target-picks .target-copy{min-width:0;text-align:left}
+#addModal .multi-target-picks .target-pick strong{
+  font-size:11px;
+  line-height:1.22;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+#addModal .multi-target-picks .target-pick small{
+  margin-top:2px;
+  font-size:9.2px;
+  line-height:1.25;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+#addModal .tx-target-summary{min-height:14px;margin:0 1px 5px;font-size:10px}
+#addModal .tx-action-bar{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+#addModal .tx-action-bar .confirm{min-height:44px;padding:11px}
+
+@media(max-width:460px){
+  #goals .goal,
+  #goals .goal:has(.stamp-progress-row),
+  #goals .goal:has(.tier-progress-row),
+  #goals .goal:has(.spend-progress-row){min-height:150px!important}
+}
+@media(max-width:340px){
+  #addModal .multi-target-picks{grid-template-columns:1fr!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-dashboard.is-compact.is-top-pulling,.home-dashboard.is-pull-releasing{transform:none!important;transition:none!important}
+}
+
+/* ===== production follow-up v4: cleaner playbook focus, tighter progress, safe sort ===== */
+/* 首頁標題直接由主問題開始，不再顯示英文 eyebrow。 */
+.home-dashboard-head{margin-top:0;margin-bottom:12px!important}
+.home-dashboard-copy{width:100%}
+
+/* 「主要追蹤」：卡名取代「自訂 1/2/3」，取消右側查看按鈕，讓摘要更緊湊。 */
+.home-focus-panel{padding:10px!important}
+.home-focus-heading{margin:0 2px 7px!important}
+.home-focus-heading strong{font-size:.84rem!important}
+.home-focus-list{gap:7px!important}
+.home-focus{
+  display:block!important;
+  min-height:0!important;
+  padding:10px 12px 9px!important;
+}
+.home-focus-main{width:100%}
+.home-focus-top{margin-bottom:3px!important}
+.home-focus-label.home-focus-card-name{
+  min-width:0;
+  overflow:hidden;
+  color:#fff!important;
+  font-size:.84rem!important;
+  font-weight:700!important;
+  letter-spacing:-.01em!important;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.home-focus-label.home-focus-card-name::before{
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
+}
+.home-focus p{margin:2px 0 6px!important;font-size:.75rem!important;line-height:1.35!important}
+.home-focus-progress{height:4px!important}
+.home-focus-action{display:none!important}
+
+/* 標準「最低簽賬」進度：把 meta、門檻文字和 bar 向上收緊，保留門檻可讀性。 */
+#goals .goal[data-mechanic="standard"] .goal-meta{margin-bottom:1px!important}
+#goals .goal[data-mechanic="standard"] .goal-lower{margin-top:0!important}
+#goals .goal[data-mechanic="standard"] .spend-progress-shell{
+  height:52px!important;
+}
+#goals .goal[data-mechanic="standard"] .spend-progress-shell .progress{
+  top:24px!important;
+}
+#goals .goal[data-mechanic="standard"] .spend-progress-marker{
+  top:39px!important;
+}
+#goals .goal[data-mechanic="standard"] .spend-progress-marker.lane-0 .spend-marker-title{bottom:21px!important}
+#goals .goal[data-mechanic="standard"] .spend-progress-marker.lane-1 .spend-marker-title{bottom:34px!important}
+#goals .goal[data-mechanic="standard"] .spend-progress-marker.lane-2 .spend-marker-title{bottom:46px!important}
+#goals .goal[data-mechanic="standard"] .spend-progress-marker .spend-marker-amount{top:3px!important}
+#goals .goal[data-mechanic="standard"] .spend-progress-row .goal-percent{margin-top:23px!important}
+
+/* 排序改用固定在控制器右邊界的自訂選單；不再交由原生 popup 決定位置。 */
+.app-home .goal-section-head,
+.app-home .goal-head-tools,
+.app-home .goal-sort-control{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.app-home .goal-head-tools{overflow:visible!important}
+.app-home .goal-sort-control{
+  position:relative;
+  overflow:visible!important;
+  padding-right:5px!important;
+}
+.app-home .goal-sort-trigger{
+  display:flex;
+  flex:1 1 auto;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  min-width:0;
+  height:30px;
+  padding:0 3px 0 2px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--wb-text-secondary,#5b638d);
+  font:inherit;
+  font-size:10.8px;
+  font-weight:820;
+  text-align:left;
+}
+.app-home .goal-sort-trigger span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.app-home .goal-sort-trigger svg{width:16px;height:16px;flex:0 0 16px;transition:transform .16s ease}
+.app-home .goal-sort-control.is-open .goal-sort-trigger svg{transform:rotate(180deg)}
+.app-home .goal-sort-menu{
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  z-index:90;
+  width:max(100%,172px);
+  max-width:min(270px,calc(100vw - 24px));
+  padding:5px;
+  border:1px solid rgba(91,88,188,.16);
+  border-radius:13px;
+  background:rgba(255,255,255,.985);
+  box-shadow:0 14px 34px rgba(34,27,80,.16);
+}
+.app-home .goal-sort-menu[hidden]{display:none!important}
+.app-home .goal-sort-menu button{
+  display:flex;
+  align-items:center;
+  width:100%;
+  min-height:34px;
+  padding:7px 9px;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#555d70;
+  font-size:11px;
+  font-weight:680;
+  text-align:left;
+}
+.app-home .goal-sort-menu button:hover,.app-home .goal-sort-menu button:focus-visible{background:#f3f0ff;color:#4f36bd;outline:none}
+.app-home .goal-sort-menu button.is-selected{background:#eee9ff;color:#5136c4;font-weight:760}
+.app-home #goalSortSelect.goal-sort-native{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  min-width:1px!important;
+  max-width:1px!important;
+  margin:-1px!important;
+  padding:0!important;
+  opacity:0!important;
+  clip-path:inset(50%)!important;
+  pointer-events:none!important;
+}
+@media(max-width:600px){
+  .app-home .goal-head-tools{grid-template-columns:minmax(0,1fr) 40px!important}
+  .app-home .goal-sort-control{width:100%!important;min-width:0!important;max-width:none!important}
+  .app-home .goal-sort-menu{right:0;width:100%;max-width:100%}
+}
+@media(max-width:430px){
+  .home-focus{padding:9px 10px 8px!important}
+  .home-focus-label.home-focus-card-name{font-size:.8rem!important}
+}
+
+
+
+/* ===== production follow-up v5: priority placement, bottom-anchored progress, electric pulse ===== */
+/* 主要追蹤徽章跟在卡名稱右方；卡名過長時先省略卡名，徽章保持完整。 */
+#goals .goal-card{flex-wrap:nowrap!important}
+#goals .goal-card-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#goals .goal-priority-badge{flex:0 0 auto}
+
+/* 等高卡片內把進度條及狀態固定壓到卡片底部。 */
+#goals .goal-body{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  min-height:0!important;
+}
+#goals .goal-lower{
+  margin-top:auto!important;
+  padding-top:6px!important;
+  padding-bottom:0!important;
+}
+#goals .goal-status{padding-bottom:0!important}
+
+/* 狀態描述只保留數字粗體；語句本身維持一般字重，但沿用行動／獎賞的提示色。 */
+#goals .goal-status-item,
+#goals .goal-status-item.is-action,
+#goals .goal-status-item.is-reward{font-weight:500!important}
+#goals .goal-status-item b{font-weight:820!important;color:currentColor!important}
+.home-focus p{font-weight:450!important}
+.home-focus p b{font-weight:760!important;color:inherit}
+
+/* 主要追蹤摘要卡本身可點擊，直接跳到下方對應目標。 */
+.home-focus[data-target-id]{cursor:pointer;transition:transform .16s ease,background .16s ease,border-color .16s ease}
+.home-focus[data-target-id]:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.24)}
+.home-focus[data-target-id]:active{transform:scale(.992)}
+.home-focus[data-target-id]:focus-visible{outline:2px solid rgba(217,255,148,.85);outline-offset:2px}
+
+/* 電脈衝：在原有掃光上再疊一組短促電紋，令低進度時亦看得到脈衝。 */
+#goals .progress>div::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  border-radius:inherit;
+  background:linear-gradient(105deg,
+    transparent 0 12%,rgba(255,255,255,.72) 14%,transparent 17% 34%,
+    rgba(255,255,255,.46) 36%,transparent 39% 58%,
+    rgba(255,255,255,.82) 60%,transparent 63% 100%);
+  opacity:0;
+  transform:translateX(-115%);
+  will-change:transform,opacity;
+  animation:wbElectricRipple 5.4s cubic-bezier(.2,.7,.2,1) calc(var(--bar-delay,0ms) + 1.05s) infinite;
+}
+@keyframes wbElectricRipple{
+  0%,20%{transform:translateX(-115%);opacity:0}
+  24%{opacity:.86}
+  31%{opacity:.34}
+  38%{transform:translateX(115%);opacity:.78}
+  45%,100%{transform:translateX(115%);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  #goals .progress>div::before{animation:none!important;opacity:0!important}
+}
+
+/* ===== production follow-up v6: status copy stays grey; only numbers carry emphasis ===== */
+/* 進度下方描述：所有非數字文字維持灰色；只有 renderNumericEmphasis() 包起的數字為粗體及目標主題色。 */
+#goals .goal-status-item,
+#goals .goal-status-item.is-action,
+#goals .goal-status-item.is-reward{
+  color:var(--wb-text-secondary)!important;
+  font-weight:500!important;
+}
+#goals .goal .goal-status-item b,
+#goals .goal .goal-status-item strong{
+  color:var(--bar-start)!important;
+  font-weight:820!important;
+}

@@ -416,8 +416,6 @@ input:focus,select:focus{
   background:linear-gradient(145deg,#f5f6ff,#efeffb)!important;color:#656c93!important;
   border:1px solid rgba(96,92,184,.12)!important;box-shadow:none!important;
 }
-.mechanic-badge{background:rgba(111,60,255,.08);color:#655bc9;border:1px solid rgba(111,60,255,.08)}
-
 /* Edit screens ------------------------------------------------------------- */
 .edit-shell{
   background:

@@ -1,13 +1,14 @@
 (() => {
   const STORAGE_KEY = 'wbatePageTransition';
   const html = document.documentElement;
+  const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   try {
     const entering = sessionStorage.getItem(STORAGE_KEY);
     if (entering === 'forward' || entering === 'back') {
       html.classList.add(`wb-enter-${entering}`);
       sessionStorage.removeItem(STORAGE_KEY);
-      window.setTimeout(() => html.classList.remove(`wb-enter-${entering}`), 420);
+      window.setTimeout(() => html.classList.remove(`wb-enter-${entering}`), reduceMotion() ? 0 : 340);
     }
   } catch (_) {}
 
@@ -22,10 +23,12 @@
     event.preventDefault();
 
     try { sessionStorage.setItem(STORAGE_KEY, direction); } catch (_) {}
-    document.body.classList.add(`wb-page-exit-${direction}`);
-    link.classList.add('is-transitioning');
+    if (!reduceMotion()) {
+      document.body.classList.add(`wb-page-exit-${direction}`);
+      link.classList.add('is-transitioning');
+    }
 
-    window.setTimeout(() => { window.location.href = href; }, direction === 'back' ? 210 : 195);
+    window.setTimeout(() => { window.location.href = href; }, reduceMotion() ? 0 : 200);
   });
 
   window.addEventListener('pageshow', () => {

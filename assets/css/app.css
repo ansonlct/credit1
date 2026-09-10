@@ -913,7 +913,6 @@ button,label.switch,.offer-tab,.cat-chip,.target-pick,.tx{
 .wizard-summary-line{font-size:16px;line-height:1.6;color:#505762;padding:9px 0;border-bottom:1px solid #edf0f3}
 .wizard-summary-line:last-child{border-bottom:0}.wizard-summary-line b{color:#17191d}
 .wizard-danger{margin-top:12px;width:100%;max-width:700px;border:0;border-radius:16px;background:#fff0f0;color:var(--bad);padding:13px;font-size:14px;font-weight:820}
-.mechanic-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;background:#f0f2f5;color:#616873;font-size:9.5px;font-weight:820;margin-left:5px}
 .wizard-mini-note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:10px}
 .wizard-choice-stack{width:100%;max-width:700px;display:grid;gap:10px;margin:0 auto 16px}
 .wizard-choice-stack .wizard-option{height:112px;min-height:112px}

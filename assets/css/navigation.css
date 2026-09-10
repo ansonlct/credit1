@@ -90,13 +90,7 @@
 .app-home{padding-top:calc(var(--wb-nav-h) + 22px)!important}
 .brand-page{padding-top:var(--wb-nav-h)}
 
-/* Home command deck: month is a filter; Add Offer is the main CTA. */
-.home-command-bar{
-  display:grid;
-  grid-template-columns:minmax(180px,.78fr) minmax(240px,1.22fr);
-  gap:11px;
-  margin:0 0 22px;
-}
+/* Shared month and offer controls. */
 .month-command,
 .offer-command{
   min-height:72px;
@@ -191,7 +185,6 @@ body.wb-page-exit-back [data-page-transition="back"]{transform:translateX(-5px) 
 @keyframes wbPageExitBack{to{opacity:.10;transform:translateX(30px) scale(.992)}}
 
 @media(max-width:760px){
-  .home-command-bar{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:9px}
   .month-command,.offer-command{min-height:68px;border-radius:18px}
   .month-command{grid-template-columns:36px minmax(0,1fr);gap:9px;padding:10px 11px}
   .command-icon{width:36px;height:36px;border-radius:12px;font-size:19px}
@@ -209,7 +202,6 @@ body.wb-page-exit-back [data-page-transition="back"]{transform:translateX(-5px) 
   .back-link{padding:8px 10px}
   .back-link span{display:none}
   .app-home{padding-top:calc(var(--wb-nav-h) + 16px)!important}
-  .home-command-bar{grid-template-columns:1fr;gap:8px;margin-bottom:19px}
   .month-command,.offer-command{min-height:62px}
   .offer-command-copy small{font-size:10px}
 }

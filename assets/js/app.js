@@ -63,18 +63,22 @@ function normalizeCardName(name=''){
   return String(name).trim().toLocaleLowerCase('zh-HK').replace(/\s+/g,' ');
 }
 let appNoticeTimer=null,appConfirmCallback=null;
+const reducedMotionQuery=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+function prefersReducedMotion(){return !!reducedMotionQuery?.matches}
 function showNotice(message,type='error'){
   const el=document.getElementById('appNotice');if(!el)return;
   el.textContent=String(message||'');el.className=`app-notice ${type==='success'?'success':type==='warn'?'warn':''}`.trim();
   requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(appNoticeTimer);
   appNoticeTimer=setTimeout(()=>el.classList.remove('show'),3000);
 }
+let appConfirmReturnFocus=null;
 function askConfirm(message,onConfirm,title='確認操作'){
   const layer=document.getElementById('appConfirm'),msg=document.getElementById('appConfirmMessage'),ttl=document.getElementById('appConfirmTitle');if(!layer)return;
+  appConfirmReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
   if(msg)msg.textContent=String(message||'');if(ttl)ttl.textContent=title;appConfirmCallback=typeof onConfirm==='function'?onConfirm:null;
   layer.classList.add('show');layer.setAttribute('aria-hidden','false');document.getElementById('appConfirmCancel')?.focus();
 }
-function closeAppConfirm(){const layer=document.getElementById('appConfirm');layer?.classList.remove('show');layer?.setAttribute('aria-hidden','true');appConfirmCallback=null}
+function closeAppConfirm(){const layer=document.getElementById('appConfirm');layer?.classList.remove('show');layer?.setAttribute('aria-hidden','true');appConfirmCallback=null;appConfirmReturnFocus?.focus?.();appConfirmReturnFocus=null}
 document.getElementById('appConfirmCancel')?.addEventListener('click',closeAppConfirm);
 document.getElementById('appConfirmOk')?.addEventListener('click',()=>{const cb=appConfirmCallback;closeAppConfirm();cb?.()});
 document.getElementById('appConfirm')?.addEventListener('click',e=>{if(e.target.id==='appConfirm')closeAppConfirm()});
@@ -278,6 +282,37 @@ function load(){
 let state=load();
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 
+/* 首頁自訂追蹤使用獨立 preference key，不改動優惠／交易 schema。 */
+const HOME_PRIORITY_KEY=KEY+'_home_priorities_v1';
+function loadHomePriorityIds(){
+  try{
+    const value=JSON.parse(localStorage.getItem(HOME_PRIORITY_KEY)||'[]');
+    return Array.isArray(value)?[...new Set(value.map(String).filter(Boolean))].slice(0,3):[];
+  }catch(_){return []}
+}
+let homePriorityIds=loadHomePriorityIds();
+function syncHomePriorityIds(){
+  const valid=new Set(state.cards.filter(target=>!target._temporary).map(target=>String(target.id)));
+  const next=homePriorityIds.filter(id=>valid.has(String(id))).slice(0,3);
+  if(next.join('\u0000')!==homePriorityIds.join('\u0000')){
+    homePriorityIds=next;
+    localStorage.setItem(HOME_PRIORITY_KEY,JSON.stringify(homePriorityIds));
+  }
+  return homePriorityIds;
+}
+function toggleHomePriority(id){
+  const targetId=String(id||'');if(!targetId)return;
+  syncHomePriorityIds();
+  if(homePriorityIds.includes(targetId))homePriorityIds=homePriorityIds.filter(item=>item!==targetId);
+  else{
+    if(homePriorityIds.length>=3){showNotice('主要追蹤最多可加入 3 個目標','warn');return}
+    homePriorityIds=[...homePriorityIds,targetId];
+  }
+  localStorage.setItem(HOME_PRIORITY_KEY,JSON.stringify(homePriorityIds));
+  renderHomeOverview();renderGoals();markHomePriorityGoal();
+  showNotice(homePriorityIds.includes(targetId)?'已加入主要追蹤':'已從主要追蹤移除','success');
+}
+
 /* 主頁回贈目標排序：獨立儲存，避免改動優惠資料結構。 */
 const GOAL_SORT_KEY=KEY+'_goal_sort';
 const GOAL_SORT_DEFAULT_DIR={card:'asc',type:'asc',end:'asc',added:'asc',progress:'desc'};
@@ -316,12 +351,18 @@ function sortGoalRows(rows){
   });
 }
 function updateGoalSortControls(){
-  const select=document.getElementById('goalSortSelect'),btn=document.getElementById('goalSortDir');
+  const select=document.getElementById('goalSortSelect'),btn=document.getElementById('goalSortDir'),current=document.getElementById('goalSortCurrent'),menu=document.getElementById('goalSortMenu');
   if(select)select.value=goalSort.key;
+  const label=select?.selectedOptions?.[0]?.textContent||'排序';
+  if(current)current.textContent=label;
+  menu?.querySelectorAll('[data-sort-value]').forEach(option=>{
+    const selected=option.dataset.sortValue===goalSort.key;
+    option.classList.toggle('is-selected',selected);
+    option.setAttribute('aria-selected',selected?'true':'false');
+  });
   if(btn){
     const asc=goalSort.dir==='asc';
     btn.textContent=asc?'↑':'↓';
-    const label=select?.selectedOptions?.[0]?.textContent||'排序';
     const direction=asc?'由小至大／由早至遲':'由大至小／由遲至早';
     btn.title=`${label}：${direction}`;
     btn.setAttribute('aria-label',`切換排序方向，目前${direction}`);
@@ -358,7 +399,7 @@ function renderGoalsWithShuffle(){
       const moved=Math.abs(dx)>.5||Math.abs(dy)>.5;
       const startX=moved?dx:side*10;
       const startY=moved?dy:0;
-      const duration=680,delay=Math.min(i*34,190);
+      const duration=280,delay=Math.min(i*22,88);
       longest=Math.max(longest,duration+delay);
       el.animate([
         {transform:`translate(${startX}px,${startY}px) scale(.982) rotate(${side*.45}deg)`,opacity:.74,offset:0},
@@ -380,6 +421,33 @@ document.getElementById('goalSortSelect')?.addEventListener('change',e=>{
 document.getElementById('goalSortDir')?.addEventListener('click',()=>{
   goalSort.dir=goalSort.dir==='asc'?'desc':'asc';
   saveGoalSort();updateGoalSortControls();renderGoalsWithShuffle();
+});
+function setGoalSortMenu(open){
+  const trigger=document.getElementById('goalSortTrigger'),menu=document.getElementById('goalSortMenu');
+  if(!trigger||!menu)return;
+  const show=!!open;
+  menu.hidden=!show;
+  trigger.setAttribute('aria-expanded',show?'true':'false');
+  trigger.closest('.goal-sort-control')?.classList.toggle('is-open',show);
+}
+document.getElementById('goalSortTrigger')?.addEventListener('click',event=>{
+  event.stopPropagation();
+  const trigger=event.currentTarget;
+  setGoalSortMenu(trigger.getAttribute('aria-expanded')!=='true');
+});
+document.getElementById('goalSortMenu')?.addEventListener('click',event=>{
+  const option=event.target.closest('[data-sort-value]');if(!option)return;
+  const select=document.getElementById('goalSortSelect');if(!select)return;
+  select.value=option.dataset.sortValue||'card';
+  setGoalSortMenu(false);
+  select.dispatchEvent(new Event('change',{bubbles:true}));
+  document.getElementById('goalSortTrigger')?.focus({preventScroll:true});
+});
+document.addEventListener('click',event=>{
+  if(!event.target.closest('.goal-sort-control'))setGoalSortMenu(false);
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')setGoalSortMenu(false);
 });
 updateGoalSortControls();
 
@@ -526,12 +594,32 @@ function homepageCampaignLine(t){
   const end=String(t.endDate||t.rebateEndDate||'').trim();
   return end?`推廣期至 ${end}`:'';
 }
-function thresholdProgressTitle(t,done,total){
+function goalEligibilityLabel(t){
   let scope='所有合資格簽賬';
   if(t.eligibilityMode==='categories'&&t.rebateCategories.length){
     scope=t.rebateCategories.map(cat=>{const label=String(cat||'').trim();return label.endsWith('簽賬')?label:`${label}簽賬`}).join('／');
   }
-  return `${scope} · 門檻進度 ${done}/${total}`;
+  return scope;
+}
+function goalEligibilityTitleLabel(t){
+  const label=goalEligibilityLabel(t);
+  return label==='所有合資格簽賬'?`💳${label}`:label;
+}
+function thresholdProgressTitle(t,done,total){
+  return `${goalEligibilityLabel(t)} · 門檻進度 ${done}/${total}`;
+}
+function homepageMilestoneRequirementLines(t){
+  // 階段優惠固定拆成兩條易掃讀資訊列：計算方式／最低簽賬一行，上限／完成獎賞一行。
+  const first=['按階段日期'];
+  if(Number(t.minTransaction||0)>0)first.push(`每筆最低簽賬 ${money(t.minTransaction)}`);
+  const second=[];
+  const capLine=linkedCapSummary(t);
+  if(capLine)second.push(capLine);
+  if(t.milestoneBonusEnabled&&hasRewardValue(t.milestoneBonusType,t.milestoneBonus)){
+    const threshold=Number(t.milestoneBonusSpend||0)>0?`全期滿 ${money(t.milestoneBonusSpend)}，再`:'全部完成再';
+    second.push(`${threshold} ${rewardValueLabel(t.milestoneBonusType,t.milestoneBonus)}`);
+  }
+  return [first.join(' · '),second.join(' · ')].filter(Boolean);
 }
 function homepageTierRequirementLines(t){
   const lines=[],campaignLine=homepageCampaignLine(t);
@@ -580,9 +668,21 @@ function renderGoalMeta(lines){
     return `<span class="goal-meta-line">· ${text}</span>`;
   }).join('');
 }
+function renderNumericEmphasis(value){
+  const raw=String(value||''),pattern=/\$?\d[\d,]*(?:\.\d+)?(?:\/\d[\d,]*(?:\.\d+)?)?%?/g;
+  let html='',last=0,match;
+  while((match=pattern.exec(raw))){
+    html+=esc(raw.slice(last,match.index))+`<b>${esc(match[0])}</b>`;
+    last=match.index+match[0].length;
+  }
+  return html+esc(raw.slice(last));
+}
 function renderGoalStatus(status){
-  /* 先 escape，再只為 $ 金額加入 <b>，避免把狀態文字當 HTML 注入。 */
-  return esc(status).replace(/(\$[0-9][0-9,]*(?:\.[0-9]+)?)/g,'<b>$1</b>');
+  /* 描述保持一般字重，只把金額、數量、百分比、分數等數字加粗。 */
+  return String(status||'').split(/\s*[‧·]\s*/).filter(Boolean).map(part=>{
+    const action=/(尚欠|再\s*\d|尚餘額度|下一門檻)/.test(part),reward=/(估算回贈|已解鎖|可得|獎賞)/.test(part);
+    return `<span class="goal-status-item${action?' is-action':''}${reward?' is-reward':''}">${renderNumericEmphasis(part)}</span>`;
+  }).join('');
 }
 function thresholdTierRewardLabel(tier,categories=[]){
   const mode=tier?.rewardMode||'rate';
@@ -690,7 +790,7 @@ function getGoalRows(){
         let focusIndex=activeIndex>=0?activeIndex:(nextFutureIndex>=0?nextFutureIndex:(next?stageStats.indexOf(next):Math.max(0,stageStats.length-1)));
         const focus=stageStats[focusIndex]||null;
         const stageStart=stageStats.map(x=>x.startDate).filter(Boolean).sort()[0]||b.start,stageEnd=stageStats.map(x=>x.endDate).filter(Boolean).sort().at(-1)||b.end,totalSpent=spendForOffer(t,{start:stageStart||'',end:stageEnd||''}),bonusNeed=Math.max(0,Number(t.milestoneBonusSpend||0)),bonusMet=!t.milestoneBonusEnabled||(allStages&&totalSpent>=bonusNeed);
-        completed=allStages&&bonusMet;title=`簽賬 · 階段獎賞 ${done.length}/${stageStats.length}`;
+        completed=allStages&&bonusMet;title=`${goalEligibilityTitleLabel(t)} · 階段獎賞 ${done.length}/${stageStats.length}`;metaLines=homepageMilestoneRequirementLines(t);
         if(focus&&!allStages){
           progress=focus.threshold?pct(focus.stageSpent,focus.threshold):100;
           const idx=focusIndex+1;
@@ -766,37 +866,15 @@ function getGoalRows(){
       status=statusParts.join(' ‧ ');
     }
     if(percent==='0%')percent=`${Math.round(progress)}%`;
-    if(t.mechanic!=='standard'&&t.targetType!=='welcome'&&t.mechanic!=='stamp'&&t.mechanic!=='tier_rate')metaLines=[meta];
     const campaignLine=homepageCampaignLine(t);
-    if(campaignLine&&!metaLines.includes(campaignLine)&&metaLines.length<3)metaLines=[campaignLine,...metaLines];
-    const titleHtml=(t.mechanic==='standard'||t.targetType==='welcome'||t.mechanic==='stamp'||t.mechanic==='tier_rate')?esc(title):`${esc(title)} <span class="mechanic-badge">${esc(mechanicLabel(t))}</span>`;
+    const stageDatedHome=(t.mechanic==='milestone'||t.mechanic==='custom')&&t.targetType!=='welcome';
+    if(campaignLine&&!stageDatedHome&&!metaLines.includes(campaignLine)&&metaLines.length<3)metaLines=[campaignLine,...metaLines];
+    const titleHtml=esc(title);
     rows.push({targetId:t.id,mechanic:t.mechanic,card:t.name,title:titleHtml,meta,metaLines,days:time.days,dayClass:remainingDayClass(time,completed),goalClass:remainingGoalClass(time,completed),progress,percent,status,completed,stampCurrent,stampTarget,stampMilestones,stageOverview,sortCard:t.name,sortType:goalSpendType(t),sortEnd:b.end||'',sortAdded:Number(t.createdAt||0)});
   });
   return sortGoalRows(rows);
 }
 
-const goalPalettes=[
-  ['#5967ff','#8c72ff','rgba(89,103,255,.25)'],['#0f9f78','#42c99c','rgba(15,159,120,.22)'],
-  ['#f08a24','#f6b44a','rgba(240,138,36,.22)'],['#d4528f','#ef7daf','rgba(212,82,143,.22)'],
-  ['#3f8fd8','#63b2ef','rgba(63,143,216,.22)'],['#7b61c9','#ae8bea','rgba(123,97,201,.22)'],
-  ['#cf5f4b','#ef8a6d','rgba(207,95,75,.22)'],['#3d8b7d','#6bb8a9','rgba(61,139,125,.22)']
-];
-function goalPalette(i){return goalPalettes[i%goalPalettes.length]}
-function goalPaletteForTarget(target){
-  /* v27：按「目標」分配色系，不再按信用卡分配。同卡不同目標會用不同顏色。 */
-  const targetIndex=Array.isArray(state?.cards)?state.cards.findIndex(x=>x.id===target?.id):-1;
-  if(targetIndex>=0)return goalPalette(targetIndex);
-  const seed=String(target?.id||target?.themeSeed||target?.createdAt||'0');
-  let hash=2166136261;
-  for(const ch of seed){hash^=ch.charCodeAt(0);hash=Math.imul(hash,16777619)>>>0}
-  return goalPalettes[hash%goalPalettes.length];
-}
-function goalThemeRgba(hex,alpha){
-  const m=/^#([0-9a-f]{6})$/i.exec(String(hex||''));
-  if(!m)return `rgba(89,103,255,${alpha})`;
-  const n=parseInt(m[1],16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-  return `rgba(${r},${g},${b},${alpha})`;
-}
 function renderStampProgress(current,target,milestones=[]){
   const total=Math.max(1,Number(target||1)),cur=Math.max(0,Number(current||0));
   if(total>8){
@@ -817,47 +895,33 @@ function renderStageOverview(info){
   }).join('');
   return previous?`<div class="goal-stage-history goal-stage-history-only">${previous}</div>`:'';
 }
-function renderGoals(){
-  updateGoalSortControls();
-  const rows=getGoalRows();
-  const goalSectionTitle=document.getElementById('goalSectionTitle');
-  if(goalSectionTitle)goalSectionTitle.textContent=`進行中的回贈目標 ( ${rows.length} 個 )`;
-  const box=document.getElementById('goals');
-  if(!rows.length){box.innerHTML='<div class="empty">未設定任何目標</div>';return}
-  box.innerHTML=rows.map((r,i)=>{
-    const [barStart,barEnd,barGlow]=goalPalette(i),delay=Math.min(i*70,420);
-    return `<div class="goal ${r.completed?'completed':''} ${r.goalClass||''}" data-target-id="${r.targetId}" style="--bar-start:${barStart};--bar-end:${barEnd};--bar-glow:${barGlow};--bar-delay:${delay}ms">
-      <div class="goal-body">
-        <div class="goal-card">${esc(r.card)}</div>
-        <div class="goal-title">${r.title}${r.completed?'<span class="trophy" title="目標達成">🏆</span>':''}<span class="goal-days ${r.dayClass}">${esc(r.days)}</span></div>
-        <div class="goal-meta">${renderGoalMeta(r.metaLines||[r.meta])}</div>
-        ${r.stageOverview?renderStageOverview(r.stageOverview):''}
-        <div class="goal-lower">
-          ${r.mechanic==='stamp'?renderStampProgress(r.stampCurrent,r.stampTarget,r.stampMilestones):`<div class="goal-progress-row"><div class="progress"><div style="--target-width:${r.progress}%"></div></div><div class="goal-percent">${r.percent}</div></div>`}
-          <div class="goal-status">${renderGoalStatus(r.status)}</div>
-        </div>
-      </div>
-      <button class="goal-modify" type="button" aria-label="修改" title="修改">✎</button>
-    </div>`;
-  }).join('');
-  bindGoalActions();
-  scheduleGoalHeightEqualize();
-}
 let goalHeightRaf=0;
 function equalizeGoalHeights(){
-  // 額度卡採用 CSS 緊湊等高，不再以內容最高的一張把全部卡拉高。
-  document.querySelectorAll('#goals .goal').forEach(g=>g.style.removeProperty('height'));
+  const goals=[...document.querySelectorAll('#goals .goal')];
+  if(!goals.length)return;
+  // 先還原自然高度，再以當下內容最高的一張作全組高度；保留 CSS 的最低高度。
+  goals.forEach(goal=>goal.style.removeProperty('height'));
+  const tallest=Math.ceil(Math.max(...goals.map(goal=>Math.max(goal.getBoundingClientRect().height,goal.scrollHeight))));
+  if(!Number.isFinite(tallest)||tallest<=0)return;
+  goals.forEach(goal=>goal.style.setProperty('height',`${tallest}px`,'important'));
 }
-function scheduleGoalHeightEqualize(){cancelAnimationFrame(goalHeightRaf);goalHeightRaf=requestAnimationFrame(equalizeGoalHeights)}
+function scheduleGoalHeightEqualize(){cancelAnimationFrame(goalHeightRaf);goalHeightRaf=requestAnimationFrame(()=>requestAnimationFrame(equalizeGoalHeights))}
 function bindGoalActions(){
   document.querySelectorAll('.goal').forEach(row=>{
-    const modify=row.querySelector('.goal-modify');
+    const modify=row.querySelector('.goal-modify'),priority=row.querySelector('.goal-priority-toggle');
     row.addEventListener('click',e=>{
-      if(e.target.closest('.goal-modify'))return;
+      if(e.target.closest('.goal-action'))return;
+      const y=window.scrollY||document.documentElement.scrollTop||0;
       const wasOpen=row.classList.contains('open');
       document.querySelectorAll('.goal.open').forEach(x=>x.classList.remove('open'));
-      if(!wasOpen)requestAnimationFrame(()=>row.classList.add('open'));
+      if(!wasOpen)row.classList.add('open');
+      // 開／收卡片只顯示浮動操作，不再重新量度整組高度；並鎖住當前 viewport，避免點卡後頁面跳回頂部。
+      requestAnimationFrame(()=>{
+        const now=window.scrollY||document.documentElement.scrollTop||0;
+        if(Math.abs(now-y)>1)window.scrollTo({top:y,left:0,behavior:'auto'});
+      });
     });
+    priority?.addEventListener('click',e=>{e.stopPropagation();toggleHomePriority(row.dataset.targetId)});
     modify?.addEventListener('click',e=>{
       e.stopPropagation();
       const id=row.dataset.targetId;if(!id)return;
@@ -891,14 +955,14 @@ function monthTransactions(month=state.month){
 }
 function transactionRowHtml(t,editable=true){
   const currentCard=cardByKey(t.cardKey),refs=Array.isArray(t.targetRefs)?t.targetRefs:[];
-  return `<div class="tx" data-id="${t.id}"><div class="tx-content"><div class="tx-card">${esc(currentCard?.name||t.cardName||'已刪除信用卡')}</div><div class="tx-sub"><span>${esc(t.date)}</span><span class="pill">${esc(t.category||'一般簽賬')}</span>${refs.map(r=>`<span class="tx-target ${r.type==='welcome'?'welcome':''}">${esc(r.label||'目標')}</span>`).join('')}</div></div><div class="tx-amount">${money(t.amount)}</div>${editable?'<button class="tx-edit" type="button" aria-label="修改消費" title="修改">✎</button>':''}</div>`;
+  return `<article class="tx" data-id="${t.id}"><div class="tx-content"><div class="tx-card">${esc(currentCard?.name||t.cardName||'已刪除信用卡')}</div><div class="tx-sub"><span>${esc(t.date)}</span><span class="pill">${esc(t.category||'一般簽賬')}</span>${refs.map(r=>`<span class="tx-target ${r.type==='welcome'?'welcome':''}">${esc(r.label||'目標')}</span>`).join('')}</div></div><div class="tx-amount">${money(t.amount)}</div>${editable?'<button class="tx-edit" type="button" aria-label="修改消費" title="修改">✎</button>':''}</article>`;
 }
 function renderTransactions(){
   const allTx=monthTransactions(),tx=allTx.slice(0,10);
   document.getElementById('txCount').textContent=`${allTx.length} 筆`;
   const more=document.getElementById('viewMoreTx');if(more)more.textContent=allTx.length>10?'查看更多':'查看全部';
   const box=document.getElementById('txList');
-  if(!tx.length){box.innerHTML='<div class="empty">暫時未有消費紀錄</div>';return}
+  if(!tx.length){box.innerHTML='<div class="empty">今個月未有消費紀錄。新增一筆消費後，進度會自動更新。</div>';return}
   box.innerHTML=tx.map(t=>transactionRowHtml(t,true)).join('');
   bindTransactionActions(box);
 }
@@ -908,8 +972,151 @@ function renderTransactionPage(){
   const tx=monthTransactions(),total=tx.reduce((sum,t)=>sum+Math.max(0,Number(t.amount||0)),0);
   document.getElementById('historyTxCount').textContent=`${tx.length} 筆`;
   document.getElementById('historyTxTotal').textContent=money(total);
-  box.innerHTML=tx.length?tx.map(t=>transactionRowHtml(t,true)).join(''):'<div class="empty">呢個月份暫時未有消費紀錄</div>';
+  box.innerHTML=tx.length?tx.map(t=>transactionRowHtml(t,true)).join(''):'<div class="empty">呢個月份未有消費紀錄。</div>';
   if(tx.length)bindTransactionActions(box);
+}
+function homeMonthLabel(month=state.month){
+  const match=/^(\d{4})-(\d{2})$/.exec(String(month||''));
+  if(!match)return String(month||'');
+  try{return new Intl.DateTimeFormat('zh-HK',{year:'numeric',month:'long'}).format(new Date(Number(match[1]),Number(match[2])-1,1))}
+  catch(_){return `${match[1]} 年 ${Number(match[2])} 月`}
+}
+function bindHomePriorityJump(){
+  document.querySelectorAll('.home-focus[data-target-id]').forEach(item=>{
+    const jump=()=>{
+      const targetId=String(item.dataset.targetId||'');
+      const goal=[...document.querySelectorAll('#goals .goal')].find(row=>String(row.dataset.targetId||'')===targetId);if(!goal)return;
+      /* 收起 playbook 後才定位，避免展開高度改變令目標卡片跳位。 */
+      setHomeDashboardCompact(true);
+      requestAnimationFrame(()=>{
+        goal.scrollIntoView({behavior:prefersReducedMotion()?'auto':'smooth',block:'center'});
+        goal.classList.add('is-priority-focus');
+        window.setTimeout(()=>goal.classList.remove('is-priority-focus'),prefersReducedMotion()?0:900);
+      });
+    };
+    item.onclick=jump;
+    item.onkeydown=e=>{
+      if(e.key!=='Enter'&&e.key!==' ')return;
+      e.preventDefault();jump();
+    };
+  });
+}
+function renderHomeOverview(){
+  const box=document.getElementById('homeOverview');if(!box)return;
+  const rows=getGoalRows(),transactions=monthTransactions(),total=transactions.reduce((sum,tx)=>sum+Math.max(0,Number(tx.amount||0)),0);
+  const completed=rows.filter(row=>row.completed).length,near=rows.filter(row=>!row.completed&&Number(row.progress||0)>=70).length;
+  syncHomePriorityIds();
+  const selected=homePriorityIds.map(id=>rows.find(row=>String(row.targetId)===id)).filter(Boolean);
+  const stats=`<div class="home-stat"><span>本月簽賬</span><strong>${money(total)}</strong></div><div class="home-stat"><span>追蹤目標</span><strong>${rows.length}</strong></div><div class="home-stat"><span>已達標</span><strong>${completed}</strong></div>`;
+  let focusRows='';
+  if(!rows.length)focusRows='<div class="home-focus is-empty"><div><strong>建立第一個回贈目標</strong><p>加入優惠後，就可以自訂最重要的追蹤目標。</p></div></div>';
+  else if(!selected.length)focusRows=homePriorityIds.length?'<div class="home-focus is-empty"><div><strong>這個月份未有主要追蹤目標</strong><p>你已選的目標仍會保留；切換月份即可查看。</p></div></div>':'<div class="home-focus is-empty"><div><strong>揀選你最想追的目標</strong><p>按一下下方目標卡，再按 ☆；最多可以加入 3 個。</p></div></div>';
+  else focusRows=selected.map(priority=>{
+    const target=state.cards.find(item=>item.id===priority.targetId),value=Math.max(0,Math.min(100,Number(priority.progress||0))),cardName=target?.name||priority.card;
+    return `<div class="home-focus" data-target-id="${esc(priority.targetId)}" role="button" tabindex="0" aria-label="前往 ${esc(cardName)} 目標卡片"><div class="home-focus-main"><div class="home-focus-top"><span class="home-focus-label home-focus-card-name">${esc(cardName)}</span><span class="home-focus-deadline">${esc(priority.days)}</span></div><p>${renderNumericEmphasis(priority.status)}</p><div class="home-focus-progress" role="progressbar" aria-label="${esc(cardName)} 完成度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(value)}"><span style="width:${value}%"></span></div></div></div>`;
+  }).join('');
+  const focus=`<section class="home-focus-panel" aria-label="主要追蹤目標"><div class="home-focus-heading"><strong>主要追蹤</strong><span>${homePriorityIds.length} / 3</span></div><div class="home-focus-list">${focusRows}</div></section>`;
+  box.innerHTML=`<div class="home-overview-meta"><span>${esc(homeMonthLabel())}</span>${near?`<span>${near} 個目標接近達標</span>`:'<span>進度一眼睇晒</span>'}</div><div class="home-stats">${stats}</div>${focus}`;
+  bindHomePriorityJump();
+}
+function markHomePriorityGoal(){
+  document.querySelectorAll('#goals .goal').forEach(goal=>goal.classList.toggle('is-priority',homePriorityIds.includes(String(goal.dataset.targetId||''))));
+}
+let homeDashboardScrollRaf=0;
+const HOME_DASHBOARD_COLLAPSE_Y=10;
+const HOME_DASHBOARD_TOP_Y=2;
+const HOME_DASHBOARD_PULL_THRESHOLD=28;
+let homeDashboardPull=0;
+let homeDashboardTouchStartY=null;
+function setHomeDashboardPull(px=0){
+  const dashboard=document.getElementById('homeDashboard');if(!dashboard)return;
+  homeDashboardPull=Math.max(0,Math.min(HOME_DASHBOARD_PULL_THRESHOLD,Number(px||0)));
+  const progress=HOME_DASHBOARD_PULL_THRESHOLD?homeDashboardPull/HOME_DASHBOARD_PULL_THRESHOLD:0;
+  dashboard.style.setProperty('--home-top-pull',String(progress));
+  dashboard.classList.toggle('is-top-pulling',dashboard.classList.contains('is-compact')&&progress>0);
+}
+function releaseHomeDashboardPull(){
+  const dashboard=document.getElementById('homeDashboard');if(!dashboard)return;
+  dashboard.classList.add('is-pull-releasing');
+  setHomeDashboardPull(0);
+  setTimeout(()=>dashboard.classList.remove('is-pull-releasing'),220);
+}
+function completeHomeDashboardPull(){
+  const dashboard=document.getElementById('homeDashboard');if(!dashboard||!dashboard.classList.contains('is-compact'))return;
+  if(homeDashboardPull<HOME_DASHBOARD_PULL_THRESHOLD)return;
+  setHomeDashboardPull(0);
+  setHomeDashboardCompact(false,{slowExpand:true});
+}
+function setHomeDashboardCompact(compact,{slowExpand=false}={}){
+  const dashboard=document.getElementById('homeDashboard'),details=document.getElementById('homeDashboardDetails'),toggle=document.getElementById('homeDashboardToggle');if(!dashboard||!toggle)return;
+  const next=!!compact;
+  const already=dashboard.classList.contains('is-compact')===next;
+  if(next)setHomeDashboardPull(0);
+  if(!next&&slowExpand)dashboard.classList.add('is-slow-expanding');
+  else dashboard.classList.remove('is-slow-expanding');
+  dashboard.classList.toggle('is-compact',next);
+  if(details){details.setAttribute('aria-hidden',next?'true':'false');details.inert=next}
+  toggle.setAttribute('aria-expanded',next?'false':'true');
+  toggle.setAttribute('aria-label',next?'打開每月回贈總覽':'收起每月回贈總覽');
+  toggle.title=next?'打開總覽':'收起總覽';
+  if(already)return;
+  if(!next&&slowExpand)setTimeout(()=>dashboard.classList.remove('is-slow-expanding'),780);
+}
+function updateHomeDashboardForScroll(){
+  homeDashboardScrollRaf=0;
+  const dashboard=document.getElementById('homeDashboard');if(!dashboard)return;
+  const y=Math.max(0,window.scrollY||document.documentElement.scrollTop||0);
+  // 向下滑即收起；回到頁頂仍保持收起，需再向上／向下拉少少才慢慢打開。
+  if(y>HOME_DASHBOARD_COLLAPSE_Y){
+    if(homeDashboardPull)releaseHomeDashboardPull();
+    if(!dashboard.classList.contains('is-compact'))setHomeDashboardCompact(true);
+  }else if(y>HOME_DASHBOARD_TOP_Y&&homeDashboardPull){
+    releaseHomeDashboardPull();
+  }
+}
+function initHomeDashboard(){
+  const toggle=document.getElementById('homeDashboardToggle'),dashboard=document.getElementById('homeDashboard');if(!toggle||!dashboard||toggle.dataset.bound)return;
+  toggle.dataset.bound='true';
+  /* 首次進入首頁預設收起「今個月，回贈點部署？」總覽。 */
+  setHomeDashboardCompact(true);
+  toggle.addEventListener('click',()=>{
+    const next=!dashboard.classList.contains('is-compact');
+    setHomeDashboardCompact(next,{slowExpand:!next});
+  });
+  window.addEventListener('scroll',()=>{
+    if(homeDashboardScrollRaf)return;
+    homeDashboardScrollRaf=requestAnimationFrame(updateHomeDashboardForScroll);
+  },{passive:true});
+  // Desktop／trackpad：已在頁頂後再向上滾少少，累積到門檻才展開，營造輕微拉力。
+  window.addEventListener('wheel',e=>{
+    const y=Math.max(0,window.scrollY||document.documentElement.scrollTop||0);
+    if(!dashboard.classList.contains('is-compact')||y>HOME_DASHBOARD_TOP_Y||e.deltaY>=0){
+      if(homeDashboardPull&&e.deltaY>0)releaseHomeDashboardPull();
+      return;
+    }
+    setHomeDashboardPull(homeDashboardPull+Math.min(14,Math.max(2,-e.deltaY*.32)));
+    if(homeDashboardPull>=HOME_DASHBOARD_PULL_THRESHOLD)completeHomeDashboardPull();
+  },{passive:true});
+  // Touch：到頁頂後再向下拉少少；未達門檻會有回彈感，達門檻才慢慢展開。
+  window.addEventListener('touchstart',e=>{
+    const y=Math.max(0,window.scrollY||document.documentElement.scrollTop||0);
+    homeDashboardTouchStartY=(dashboard.classList.contains('is-compact')&&y<=HOME_DASHBOARD_TOP_Y&&e.touches?.length===1)?e.touches[0].clientY:null;
+  },{passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(homeDashboardTouchStartY===null||!dashboard.classList.contains('is-compact')||!e.touches?.length)return;
+    const y=Math.max(0,window.scrollY||document.documentElement.scrollTop||0);
+    if(y>HOME_DASHBOARD_TOP_Y){homeDashboardTouchStartY=e.touches[0].clientY;setHomeDashboardPull(0);return}
+    const drag=Math.max(0,e.touches[0].clientY-homeDashboardTouchStartY);
+    setHomeDashboardPull(Math.min(HOME_DASHBOARD_PULL_THRESHOLD,drag*.58));
+  },{passive:true});
+  window.addEventListener('touchend',()=>{
+    if(homeDashboardTouchStartY===null)return;
+    homeDashboardTouchStartY=null;
+    if(homeDashboardPull>=HOME_DASHBOARD_PULL_THRESHOLD)completeHomeDashboardPull();
+    else releaseHomeDashboardPull();
+  },{passive:true});
+  window.addEventListener('touchcancel',()=>{homeDashboardTouchStartY=null;releaseHomeDashboardPull()},{passive:true});
+  updateHomeDashboardForScroll();
 }
 let routeAnimationDirection='';
 let routeAnimationTimer=0;
@@ -941,7 +1148,7 @@ function updatePageRoute(){
     if(historyMode&&!currentlyHistory)direction='forward';
     else if(!historyMode&&currentlyHistory)direction='back';
   }
-  if(!routeInitialized||!direction){setPageRouteImmediate(historyMode);return}
+  if(!routeInitialized||!direction||prefersReducedMotion()){setPageRouteImmediate(historyMode);return}
 
   document.body.classList.add('route-transitioning');
   clearRouteMotion(main);clearRouteMotion(history);
@@ -956,8 +1163,8 @@ function updatePageRoute(){
       renderTransactionPage();history.classList.remove('hidden');
       document.body.classList.add('history-route');window.scrollTo(0,0);
       history.classList.add('route-enter-from-right');
-      routeAnimationTimer=setTimeout(()=>{clearRouteMotion(history);document.body.classList.remove('route-transitioning')},285);
-    },225);
+      routeAnimationTimer=setTimeout(()=>{clearRouteMotion(history);document.body.classList.remove('route-transitioning')},300);
+    },220);
     return;
   }
   if(direction==='back'&&!historyMode){
@@ -968,8 +1175,8 @@ function updatePageRoute(){
       main.classList.remove('hidden');bottom?.classList.remove('hidden');
       document.body.classList.remove('history-route');window.scrollTo(0,mainRouteScrollY||0);
       main.classList.add('route-enter-from-left');
-      routeAnimationTimer=setTimeout(()=>{clearRouteMotion(main);document.body.classList.remove('route-transitioning')},285);
-    },225);
+      routeAnimationTimer=setTimeout(()=>{clearRouteMotion(main);document.body.classList.remove('route-transitioning')},300);
+    },220);
     return;
   }
   setPageRouteImmediate(historyMode);
@@ -1079,13 +1286,13 @@ function renderTxTargetPicks(){
   let hit=0;const preferredIds=Array.isArray(txInitialTargetIds)?txInitialTargetIds:null;
   box.innerHTML=targets.map(t=>{
     const amount=parseFloat(document.getElementById('txAmount')?.value||0);const active=preferredIds?preferredIds.includes(t.id):targetAutoMatches(t,category,date,amount);if(active)hit++;
-    return `<div class="target-pick ${t.targetType==='welcome'?'welcome':''} ${active?'active':''}" data-target-id="${t.id}" role="button" tabindex="0" aria-pressed="${active?'true':'false'}">
+    return `<button class="target-pick ${t.targetType==='welcome'?'welcome':''} ${active?'active':''}" data-target-id="${t.id}" type="button" aria-pressed="${active?'true':'false'}">
       <span class="target-dot"></span><span class="target-copy"><strong>${esc(targetShortLabel(t))}</strong><small>${esc(targetDetailLabel(t))}</small></span>
-    </div>`;
+    </button>`;
   }).join('');
   box.querySelectorAll('.target-pick').forEach(el=>{
     const toggle=()=>{el.classList.toggle('active');el.setAttribute('aria-pressed',el.classList.contains('active')?'true':'false');updateTxTargetSummary()};
-    el.addEventListener('click',toggle);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+    el.addEventListener('click',toggle);
   });
   if(preferredIds)txInitialTargetIds=null;
   summary.className=`tx-target-summary ${hit?'hit':'none'}`;
@@ -1097,7 +1304,7 @@ function updateTxTargetSummary(){
 }
 
 function render(){
-  document.getElementById('monthPicker').value=state.month;renderGoals();renderTransactions();renderTransactionPage();
+  document.getElementById('monthPicker').value=state.month;syncMonthPickerDisplay();renderHomeOverview();renderGoals();markHomePriorityGoal();renderTransactions();renderTransactionPage();
 }
 let editingTransactionId=null,txInitialCategory=null,txInitialTargetIds=null;
 function resetTransactionEditor(){
@@ -1124,20 +1331,40 @@ function syncModalScrollLock(){
   const locked=[...document.querySelectorAll('.modal.show')].some(m=>m.id==='settingsModal'||m.id==='addModal');
   document.documentElement.classList.toggle('modal-open',locked);document.body.classList.toggle('modal-open',locked);
 }
-function openModal(id){const el=document.getElementById(id);el.classList.remove('closing');el.classList.add('show');syncModalScrollLock()}
+const modalReturnFocus=new Map();
+function focusableElements(root){return [...root.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>!el.closest('.hidden')&&el.getClientRects().length)}
+function openModal(id){
+  const el=document.getElementById(id);if(!el)return;
+  modalReturnFocus.set(id,document.activeElement instanceof HTMLElement?document.activeElement:null);
+  el.classList.remove('closing');el.classList.add('show');el.setAttribute('aria-hidden','false');syncModalScrollLock();
+  requestAnimationFrame(()=>el.querySelector('.sheet')?.focus({preventScroll:true}));
+}
 function closeModal(id){
   const el=document.getElementById(id);if(!el.classList.contains('show'))return;
   if(id==='settingsModal'&&creatingNewTarget&&editingTargetId){const unsaved=editingTargetId;state.cards=state.cards.filter(t=>t.id!==unsaved);creatingNewTarget=false;listCreateMode=false;editingTargetId=null;editingBackup=null}
   else if(id==='settingsModal'&&!creatingNewTarget&&editingTargetId&&editingBackup){const idx=state.cards.findIndex(t=>t.id===editingTargetId);if(idx>=0)state.cards[idx]=normalizeTarget(editingBackup);editingTargetId=null;editingBackup=null;render()}
-  el.classList.add('closing');setTimeout(()=>{el.classList.remove('show','closing');if(id==='addModal')resetTransactionEditor();syncModalScrollLock()},id==='addModal'?230:190);
+  el.classList.add('closing');setTimeout(()=>{el.classList.remove('show','closing');el.setAttribute('aria-hidden','true');if(id==='addModal')resetTransactionEditor();syncModalScrollLock();modalReturnFocus.get(id)?.focus?.();modalReturnFocus.delete(id)},prefersReducedMotion()?0:200);
 }
 document.querySelectorAll('[data-close]').forEach(b=>{b.onclick=()=>closeModal(b.dataset.close)});
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+document.addEventListener('keydown',e=>{
+  const confirmLayer=document.getElementById('appConfirm');
+  const activeLayer=confirmLayer?.classList.contains('show')?confirmLayer:[...document.querySelectorAll('.modal.show')].at(-1);
+  if(!activeLayer)return;
+  if(e.key==='Escape'){e.preventDefault();confirmLayer?.classList.contains('show')?closeAppConfirm():closeModal(activeLayer.id);return}
+  if(e.key!=='Tab')return;
+  const items=focusableElements(activeLayer);if(!items.length){e.preventDefault();activeLayer.querySelector('.sheet,.app-confirm-card')?.focus?.();return}
+  const first=items[0],last=items.at(-1);
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
 
 document.getElementById('openAdd').onclick=()=>openTransactionEditor();
 document.getElementById('amountEntry')?.addEventListener('click',()=>document.getElementById('txAmount')?.focus());
+let txTargetRenderFrame=0;
+function scheduleTxTargetPicks(){cancelAnimationFrame(txTargetRenderFrame);txTargetRenderFrame=requestAnimationFrame(()=>{txTargetRenderFrame=0;renderTxTargetPicks()})}
 document.getElementById('txAmount')?.addEventListener('input',e=>{
-  let v=String(e.target.value||'').replace(/[^0-9.]/g,'');const dot=v.indexOf('.');if(dot>=0)v=v.slice(0,dot+1)+v.slice(dot+1).replace(/\./g,'').slice(0,2);v=v.replace(/^0+(?=\d)/,'');e.target.value=v;e.target.style.width=`${Math.min(10,Math.max(1,v.length||1))}ch`;renderTxTargetPicks();
+  let v=String(e.target.value||'').replace(/[^0-9.]/g,'');const dot=v.indexOf('.');if(dot>=0)v=v.slice(0,dot+1)+v.slice(dot+1).replace(/\./g,'').slice(0,2);v=v.replace(/^0+(?=\d)/,'');e.target.value=v;e.target.style.width=`${Math.min(10,Math.max(1,v.length||1))}ch`;scheduleTxTargetPicks();
 });
 document.getElementById('txCard').addEventListener('change',renderTxCategories);
 document.getElementById('txCategory').addEventListener('change',renderTxTargetPicks);
@@ -1156,7 +1383,7 @@ document.getElementById('confirmAdd').onclick=()=>{
     targetRefs:selectedTargets.map(t=>({id:t.id,type:t.targetType,label:targetShortLabel(t)})),date,createdAt:existing?.createdAt||Date.now()
   };
   if(existing){const idx=state.transactions.findIndex(t=>t.id===existing.id);if(idx>=0)state.transactions[idx]=record}else state.transactions.push(record);
-  state.month=date.slice(0,7);save();render();closeModal('addModal');
+  state.month=date.slice(0,7);save();render();closeModal('addModal');showNotice(existing?'消費紀錄已更新':'消費已加入','success');
 };
 document.getElementById('deleteTx')?.addEventListener('click',()=>{
   const id=editingTransactionId;if(!id)return;const tx=state.transactions.find(t=>t.id===id);if(!tx)return;
@@ -1165,6 +1392,12 @@ document.getElementById('deleteTx')?.addEventListener('click',()=>{
   },'刪除消費');
 });
 document.getElementById('monthPicker').onchange=e=>{state.month=e.target.value||localMonthStr();save();render()};
+function syncMonthPickerDisplay(){
+  const display=document.getElementById('monthPickerDisplay'),value=String(document.getElementById('monthPicker')?.value||state.month||localMonthStr());
+  if(!display)return;
+  const match=value.match(/^(\d{4})-(\d{2})$/);
+  display.textContent=match?`${match[1]}年${match[2]}月`:value;
+}
 document.getElementById('historyMonthPicker')?.addEventListener('change',e=>{state.month=e.target.value||localMonthStr();save();render()});
 document.getElementById('viewMoreTx')?.addEventListener('click',()=>{routeAnimationDirection='forward';location.hash='transactions'});
 document.getElementById('historyBack')?.addEventListener('click',()=>{routeAnimationDirection='back';location.hash=''});
@@ -1712,12 +1945,13 @@ window.saveTarget=id=>{
   if(t.mechanic==='recurring'&&(!t.startDate||!t.endDate)){wizardStep=7;renderSettings();showNotice('請設定分期優惠開始及結束日期');return}
   if(!validateLimitSettings(t)||!validateThresholdRules(t)||!validateMilestoneRules(t)||!validateStampRules(t))return;
   if(t.targetType==='welcome')t.mechanic='milestone';if(!t.capEnabled||t.capType==='none'){t.capEnabled=false;t.capType='none';t.capAmount=0}else t.capEnabled=true;t.rebateEndDate=t.endDate||'';if(t.milestones.length){const first=[...t.milestones].sort((a,b)=>a.threshold-b.threshold)[0];t.welcomeRequirement=first.threshold;t.welcomeRewardType=first.rewardType;t.welcomeReward=first.reward}
-  t.cardKey=resolveCardKeyForTarget(t,t.name);delete t._temporary;save();creatingNewTarget=false;listCreateMode=false;editingTargetId=null;editingBackup=null;wizardStep=1;render();renderSettings();closeModal('settingsModal');
+  const wasCreating=creatingNewTarget;t.cardKey=resolveCardKeyForTarget(t,t.name);delete t._temporary;save();creatingNewTarget=false;listCreateMode=false;editingTargetId=null;editingBackup=null;wizardStep=1;render();renderSettings();closeModal('settingsModal');showNotice(wasCreating?'優惠已加入':'優惠已更新','success');
 };
 window.removeTarget=id=>{const t=state.cards.find(x=>x.id===id);if(!t)return;askConfirm(`刪除「${t.name}」呢個優惠？\n消費紀錄會保留。`,()=>{state.cards=state.cards.filter(x=>x.id!==id);state.transactions.forEach(tx=>{tx.targetIds=(tx.targetIds||[]).filter(x=>x!==id);tx.targetRefs=(tx.targetRefs||[]).filter(x=>x.id!==id)});save();editingTargetId=null;creatingNewTarget=false;listCreateMode=false;editingBackup=null;wizardStep=1;render();renderSettings();closeModal('settingsModal');showNotice('優惠已刪除','success')},'刪除優惠');};
 
 document.addEventListener('click',e=>{if(!e.target.closest('.card-name-picker'))document.querySelectorAll('.card-name-menu').forEach(x=>x.classList.add('hidden'))});
-window.addEventListener('scroll',()=>document.querySelector('.top')?.classList.toggle('is-scrolled',window.scrollY>6),{passive:true});
+const topBar=document.querySelector('.top');let topBarScrollFrame=0;
+window.addEventListener('scroll',()=>{if(topBarScrollFrame)return;topBarScrollFrame=requestAnimationFrame(()=>{topBar?.classList.toggle('is-scrolled',window.scrollY>6);topBarScrollFrame=0})},{passive:true});
 window.addEventListener('resize',scheduleGoalHeightEqualize,{passive:true});
 
 
@@ -2357,12 +2591,32 @@ function v19RenderTierProgress(target,row){
   const markers=specs.map((x,i)=>v20ProgressMarker({...x,lane:lanes[i]})).join('');
   return `<div class="spend-progress-row tier-progress-row ${unlimited?'is-unlimited':''}"><div class="spend-progress-shell tier-progress-shell"><div class="progress ${unlimited?'unlimited-progress':''}"><div style="--target-width:${fill}%"></div></div>${markers}</div><div class="goal-percent ${unlimited?'goal-percent-infinite':''}">${percent}</div></div>`;
 }
-renderGoals=function(){
-  updateGoalSortControls();const rows=getGoalRows();const goalSectionTitle=document.getElementById('goalSectionTitle');if(goalSectionTitle)goalSectionTitle.textContent=`進行中的回贈目標 ( ${rows.length} 個 )`;const box=document.getElementById('goals');if(!rows.length){box.innerHTML='<div class="empty">未設定任何目標</div>';return}
-  box.innerHTML=rows.map((r,i)=>{const target=state.cards.find(x=>x.id===r.targetId),[barStart,barEnd,barGlow]=goalPaletteForTarget(target),themeSoft=goalThemeRgba(barStart,.09),themeFade=goalThemeRgba(barEnd,.04),themeSoftHover=goalThemeRgba(barStart,.12),themeFadeHover=goalThemeRgba(barEnd,.06),delay=Math.min(i*70,420);const progressHtml=r.mechanic==='stamp'?renderStampProgress(r.stampCurrent,r.stampTarget,r.stampMilestones):(r.mechanic==='tier_rate'?v19RenderTierProgress(target,r):(r.mechanic==='standard'?v20RenderStandardProgress(target,r):`<div class="goal-progress-row"><div class="progress"><div style="--target-width:${r.progress}%"></div></div><div class="goal-percent">${r.percent}</div></div>`));return `<div class="goal ${r.completed?'completed':''} ${r.goalClass||''}" data-target-id="${r.targetId}" style="--bar-start:${barStart};--bar-end:${barEnd};--bar-glow:${barGlow};--theme-soft:${themeSoft};--theme-fade:${themeFade};--theme-soft-hover:${themeSoftHover};--theme-fade-hover:${themeFadeHover};--bar-delay:${delay}ms"><div class="goal-body"><div class="goal-card">${esc(r.card)}</div><div class="goal-title">${r.title}${r.completed?'<span class="trophy" title="目標達成">🏆</span>':''}<span class="goal-days ${r.dayClass}">${esc(r.days)}</span></div><div class="goal-meta">${renderGoalMeta(r.metaLines||[r.meta])}</div>${r.stageOverview?renderStageOverview(r.stageOverview):''}<div class="goal-lower">${progressHtml}<div class="goal-status">${renderGoalStatus(r.status)}</div></div></div><button class="goal-modify" type="button" aria-label="修改" title="修改">✎</button></div>`}).join('');bindGoalActions();scheduleGoalHeightEqualize();v27ScheduleMarkerLayout();
-};
+function annotateProgressBars(){
+  document.querySelectorAll('#goals .progress').forEach(progress=>{
+    const fill=progress.firstElementChild;
+    const value=Math.max(0,Math.min(100,Math.round(parseFloat(fill?.style.getPropertyValue('--target-width'))||0)));
+    progress.setAttribute('role','progressbar');progress.setAttribute('aria-valuemin','0');progress.setAttribute('aria-valuemax','100');progress.setAttribute('aria-valuenow',String(value));progress.setAttribute('aria-label',`目標完成度 ${value}%`);
+  });
+}
+function renderGoals(){
+  updateGoalSortControls();
+  const rows=getGoalRows(),goalSectionTitle=document.getElementById('goalSectionTitle'),box=document.getElementById('goals');
+  if(goalSectionTitle)goalSectionTitle.textContent=`目標追蹤 · ${rows.length} 個`;
+  if(!rows.length){box.innerHTML='<div class="empty">未有回贈目標。按「新增優惠」開始設定。</div>';return}
+  syncHomePriorityIds();
+  box.innerHTML=rows.map((r,i)=>{
+    const target=state.cards.find(x=>x.id===r.targetId),selected=homePriorityIds.includes(String(r.targetId));
+    const delay=Math.min(i*24,140);
+    const progressHtml=r.mechanic==='stamp'?renderStampProgress(r.stampCurrent,r.stampTarget,r.stampMilestones):(r.mechanic==='tier_rate'?v19RenderTierProgress(target,r):(r.mechanic==='standard'?v20RenderStandardProgress(target,r):`<div class="goal-progress-row"><div class="progress"><div style="--target-width:${r.progress}%"></div></div><div class="goal-percent">${r.percent}</div></div>`));
+    const priorityBadge=selected?'<span class="goal-priority-badge">★ 主要追蹤</span>':'';
+    return `<article class="goal ${r.completed?'completed':''} ${r.goalClass||''} ${selected?'is-priority':''}" data-target-id="${r.targetId}" data-mechanic="${esc(r.mechanic)}" style="--bar-delay:${delay}ms"><div class="goal-body"><div class="goal-card"><span class="goal-card-name">${esc(r.card)}</span>${priorityBadge}</div><div class="goal-title">${r.title}${r.completed?'<span class="trophy" title="目標達成" aria-label="目標達成">🏆</span>':''}<span class="goal-days ${r.dayClass}">${esc(r.days)}</span></div><div class="goal-meta">${renderGoalMeta(r.metaLines||[r.meta])}</div>${r.stageOverview?renderStageOverview(r.stageOverview):''}<div class="goal-lower">${progressHtml}<div class="goal-status">${renderGoalStatus(r.status)}</div></div></div><div class="goal-actions"><button class="goal-action goal-priority-toggle" type="button" aria-pressed="${selected?'true':'false'}" aria-label="${selected?'從主要追蹤移除':'加入主要追蹤'} ${esc(r.card)}" title="${selected?'取消追蹤':'主要追蹤'}">${selected?'★':'☆'}</button><button class="goal-action goal-modify" type="button" aria-label="修改 ${esc(r.card)} 優惠" title="修改">✎</button></div></article>`;
+  }).join('');
+  annotateProgressBars();bindGoalActions();scheduleGoalHeightEqualize();v27ScheduleMarkerLayout();
+}
 
 
 render();
+initHomeDashboard();
 updatePageRoute();
 startGoalCountdownClock();
+document.fonts?.ready?.then(scheduleGoalHeightEqualize).catch?.(()=>{});
