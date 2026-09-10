@@ -162,8 +162,8 @@
   transition:border-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard)!important;
 }
 #goals .goal:hover{border-color:rgba(89,65,201,.18)!important;box-shadow:0 9px 25px rgba(35,29,78,.07)}
-#goals .goal::before{top:0;bottom:0;left:0;width:4px;border-radius:0;background:linear-gradient(180deg,#6848e8,#8b70ff)!important;box-shadow:none!important}
-#goals .goal.completed::before{background:linear-gradient(180deg,#168b6b,#4fc6a0)!important}
+#goals .goal::before{top:0;bottom:0;left:0;width:4px;border-radius:0;background:linear-gradient(180deg,#168df6 0%,#5d52ff 38%,#9a43ee 66%,#ef48a6 100%)!important;box-shadow:none!important}
+#goals .goal.completed::before{background:linear-gradient(180deg,#168df6 0%,#5d52ff 38%,#9a43ee 66%,#ef48a6 100%)!important}
 #goals .goal.is-priority{border-color:rgba(104,72,232,.28)!important;box-shadow:0 9px 28px rgba(81,55,178,.09)!important}
 #goals .goal.is-priority-focus{animation:homeGoalFocus .75s var(--ease-emphasized) both}
 @keyframes homeGoalFocus{40%{transform:scale(1.012);box-shadow:0 14px 34px rgba(91,61,198,.17)}100%{transform:none}}
@@ -772,4 +772,27 @@
 #goals .goal .goal-status-item strong{
   color:var(--bar-start)!important;
   font-weight:820!important;
+}
+
+/* ===== production follow-up v7: compact priority star + true bottom anchoring ===== */
+/* 主要追蹤標記只顯示星號，保留卡名右方位置。 */
+#goals .goal-priority-badge{
+  padding:1px 5px!important;
+  min-width:20px;
+  text-align:center;
+}
+
+/* 所有玩法（包括 standard 的舊高 specificity 規則）都把進度及描述壓到卡片最底。 */
+#goals .goal[data-mechanic] .goal-body{
+  height:100%!important;
+  align-self:stretch!important;
+}
+#goals .goal[data-mechanic] .goal-lower{
+  margin-top:auto!important;
+  padding-top:4px!important;
+  padding-bottom:0!important;
+}
+#goals .goal[data-mechanic] .goal-status{
+  margin-bottom:0!important;
+  padding-bottom:0!important;
 }

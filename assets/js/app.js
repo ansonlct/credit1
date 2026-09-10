@@ -571,11 +571,11 @@ function remainingGoalClass(time,completed){
 function rebateProgressTitle(t,rate){
   const rateText=Number(rate||0).toFixed(Number.isInteger(Number(rate||0))?0:1);
   if(t.eligibilityMode==='categories'&&t.rebateCategories.length){
-    const names=t.rebateCategories.map(cat=>{
-      const label=String(cat||'').trim();
-      return `${CATEGORY_EMOJI[label]||'🏷️'}${label}${label.endsWith('簽賬')?'':'簽賬'}`;
-    }).join('／');
-    return `${names} · 額外 ${rateText}%`;
+    const categories=t.rebateCategories.map(cat=>String(cat||'').trim()).filter(Boolean);
+    /* 兩個或以上指定類別時，主頁統一收窄為「指定類別簽賬」，避免標題把所有類別逐一列出。 */
+    if(categories.length>=2)return `🏷️指定類別簽賬 · 額外 ${rateText}%`;
+    const label=categories[0]||'指定類別';
+    return `${CATEGORY_EMOJI[label]||'🏷️'}${label}${label.endsWith('簽賬')?'':'簽賬'} · 額外 ${rateText}%`;
   }
   return `💳所有合資格簽賬 · 額外 ${rateText}%`;
 }
@@ -626,10 +626,7 @@ function homepageTierRequirementLines(t){
   if(campaignLine)lines.push(campaignLine);
   if(Number(t.minTransaction||0)>0)lines.push(`每筆最低簽賬 ${money(t.minTransaction)}`);
   const capLine=linkedCapSummary(t);if(capLine)lines.push(capLine);
-  if(!lines.length){
-    const period=({monthly:'每月重置',quarterly:'每季度重置',yearly:'全年'})[t.periodType];
-    if(period)lines.push(period);
-  }
+  if(!lines.length)lines.push('無上限簽賬');
   return lines.slice(0,3);
 }
 function homepageRequirementLines(t){
@@ -649,7 +646,7 @@ function homepageRequirementLines(t){
     if(Number(t.minTransaction||0)>0)lines.push(`每筆最低簽賬 ${money(t.minTransaction)}`);
     const capLine=linkedCapSummary(t);
     if(capLine)lines.push(capLine);
-    return lines.length?lines:[periodPrefix||'指定推廣期'];
+    return lines.length?lines:['無上限簽賬'];
   }
   return [offerMeta(t)];
 }
@@ -762,7 +759,7 @@ function tierEstimatedRebate(t,spent,current,bounds=offerBounds(t)){
 function getGoalRows(){
   const rows=[];
   state.cards.filter(t=>!t._temporary&&offerVisibleInMonth(t)).forEach(t=>{
-    const b=offerBounds(t),time=offerEndStatus(t,b),spent=spendForOffer(t,b);let title='',status='',progress=0,percent='0%',completed=false,meta=offerMeta(t),metaLines=homepageRequirementLines(t),stampCurrent=0,stampTarget=0,stampMilestones=[],stageOverview=null;
+    const b=offerBounds(t),time=offerEndStatus(t,b),spent=spendForOffer(t,b);let title='',status='',progress=0,percent='0%',completed=false,rebateAmount=0,meta=offerMeta(t),metaLines=homepageRequirementLines(t),stampCurrent=0,stampTarget=0,stampMilestones=[],stageOverview=null;
     if(t.mechanic==='tier_rate'){
       const tiers=[...t.tiers].sort((a,b)=>a.threshold-b.threshold),done=tiers.filter(x=>spent>=x.threshold),current=[...done].at(-1)||null,next=tiers.find(x=>spent<x.threshold),highestThreshold=Math.max(0,Number(tiers.at(-1)?.threshold||0)),capSpend=Math.max(0,Number(capAmounts(t).spend||0)),target=capSpend>0?capSpend:highestThreshold;
       progress=target?pct(spent,target):(tiers.length?100:0);
@@ -771,6 +768,7 @@ function getGoalRows(){
       title=thresholdProgressTitle(t,done.length,tiers.length);
       metaLines=homepageTierRequirementLines(t);
       const estimatedRebate=tierEstimatedRebate(t,spent,current,b);
+      rebateAmount=estimatedRebate!==null?estimatedRebate:done.reduce((sum,x)=>sum+(((x.rewardMode||'rate')==='reward'&&cleanRewardType(x.rewardType)==='現金回贈')?Math.max(0,Number(x.reward||0)):0),0);
       const statusParts=[`已簽 ${money(spent)}`];
       if(next)statusParts.push(`尚欠 ${money(Math.max(0,next.threshold-spent))} 至下一門檻`);
       if(capSpend>0)statusParts.push(spent>=capSpend?'已達簽賬上限':`尚餘額度 ${money(Math.max(0,capSpend-spent))}`);
@@ -790,6 +788,8 @@ function getGoalRows(){
         let focusIndex=activeIndex>=0?activeIndex:(nextFutureIndex>=0?nextFutureIndex:(next?stageStats.indexOf(next):Math.max(0,stageStats.length-1)));
         const focus=stageStats[focusIndex]||null;
         const stageStart=stageStats.map(x=>x.startDate).filter(Boolean).sort()[0]||b.start,stageEnd=stageStats.map(x=>x.endDate).filter(Boolean).sort().at(-1)||b.end,totalSpent=spendForOffer(t,{start:stageStart||'',end:stageEnd||''}),bonusNeed=Math.max(0,Number(t.milestoneBonusSpend||0)),bonusMet=!t.milestoneBonusEnabled||(allStages&&totalSpent>=bonusNeed);
+        rebateAmount=stageStats.reduce((sum,x)=>sum+(x.met&&cleanRewardType(x.rewardType)==='現金回贈'?Math.max(0,Number(x.reward||0)):0),0);
+        if(t.milestoneBonusEnabled&&allStages&&bonusMet&&cleanRewardType(t.milestoneBonusType)==='現金回贈')rebateAmount+=Math.max(0,Number(t.milestoneBonus||0));
         completed=allStages&&bonusMet;title=`${goalEligibilityTitleLabel(t)} · 階段獎賞 ${done.length}/${stageStats.length}`;metaLines=homepageMilestoneRequirementLines(t);
         if(focus&&!allStages){
           progress=focus.threshold?pct(focus.stageSpent,focus.threshold):100;
@@ -806,6 +806,8 @@ function getGoalRows(){
         meta=`${meta} · ${stageStats.length} 個階段${t.milestoneBonusEnabled?` · 全部完成${bonusNeed>0?`且全期滿 ${money(bonusNeed)}`:''}再 ${rewardValueLabel(t.milestoneBonusType,t.milestoneBonus)}`:''}`;
       }else{
         const done=ms.filter(x=>spent>=x.threshold),next=ms.find(x=>spent<x.threshold),target=next?.threshold||ms.at(-1)?.threshold||0,allStages=!next&&ms.length>0,bonusNeed=Math.max(0,Number(t.milestoneBonusSpend||0)),bonusMet=!t.milestoneBonusEnabled||(allStages&&spent>=bonusNeed);
+        rebateAmount=done.reduce((sum,x)=>sum+(cleanRewardType(x.rewardType)==='現金回贈'?Math.max(0,Number(x.reward||0)):0),0);
+        if(t.milestoneBonusEnabled&&allStages&&bonusMet&&cleanRewardType(t.milestoneBonusType)==='現金回贈')rebateAmount+=Math.max(0,Number(t.milestoneBonus||0));
         progress=allStages&&t.milestoneBonusEnabled&&!bonusMet?(bonusNeed?pct(spent,bonusNeed):100):(target?pct(spent,target):0);completed=allStages&&bonusMet;
         if(t.targetType==='welcome'){
           const first=ms[0]||null;
@@ -825,6 +827,8 @@ function getGoalRows(){
       const months=campaignMonths(t.startDate,t.endDate),selected=state.month,monthStart=selected+'-01',monthEndStr=monthEnd(selected),thisSpent=spendForOffer(t,{start:monthStart,end:monthEndStr}),threshold=Number(t.recurringThreshold||0);
       const achieved=months.filter(m=>spendForOffer(t,{start:m+'-01',end:monthEnd(m)})>=threshold).length,total=months.length||1;
       progress=threshold?pct(thisSpent,threshold):0;completed=months.length>0&&achieved===months.length;
+      if(cleanRewardType(t.recurringRewardType)==='現金回贈')rebateAmount=achieved*Math.max(0,Number(t.recurringReward||0));
+      if(completed&&cleanRewardType(t.completionBonusType)==='現金回贈')rebateAmount+=Math.max(0,Number(t.completionBonus||0));
       title=`簽賬 · 分期達標 ${achieved}/${total}`;
       status=thisSpent>=threshold?`${selected} 已達標 ${money(thisSpent)}；${months.length&&achieved===months.length&&t.completionBonus>0?'已解鎖完成獎賞 '+rewardValueLabel(t.completionBonusType,t.completionBonus):'每期獎賞 '+rewardValueLabel(t.recurringRewardType,t.recurringReward)}`:`${selected} 已簽 ${money(thisSpent)}，尚欠 ${money(Math.max(0,threshold-thisSpent))}`;
       meta=`${meta} · 每期 ${money(threshold)} → ${rewardValueLabel(t.recurringRewardType,t.recurringReward)}${t.completionBonus>0?` · 全期完成再 ${rewardValueLabel(t.completionBonusType,t.completionBonus)}`:''}`;
@@ -832,6 +836,7 @@ function getGoalRows(){
       const stamps=stampCountForOffer(t,b),stampCap=Math.max(0,Number(t.stampCap||0));
       if(t.stampMode==='repeat'){
         const every=Math.max(1,Number(t.stampRepeatEvery||1)),rewardLimit=Math.max(0,Number(t.stampRewardCap||0)),earnedRaw=Math.floor(stamps/every),earnedRewards=rewardLimit>0?Math.min(earnedRaw,rewardLimit):earnedRaw;
+        if(cleanRewardType(t.stampRepeatRewardType)==='現金回贈')rebateAmount=earnedRewards*Math.max(0,Number(t.stampRepeatReward||0));
         let target;if(rewardLimit>0)target=every*rewardLimit;else if(stampCap>0)target=stampCap;else target=(Math.floor(stamps/every)+1)*every;
         if(stampCap>0)target=Math.min(target,stampCap);target=Math.max(1,target);
         completed=rewardLimit>0?earnedRewards>=rewardLimit:(stampCap>0&&stamps>=stampCap);
@@ -844,6 +849,7 @@ function getGoalRows(){
         metaLines=[stampEarnDescription(t)];
       }else{
         const ms=[...t.stampMilestones].sort((a,b)=>a.count-b.count),done=ms.filter(x=>stamps>=x.count),next=ms.find(x=>stamps<x.count),target=next?.count||ms.at(-1)?.count||0;
+        rebateAmount=done.reduce((sum,x)=>sum+(cleanRewardType(x.rewardType)==='現金回贈'?Math.max(0,Number(x.reward||0)):0),0);
         progress=target?pct(stamps,target):0;completed=!next&&ms.length>0;percent=`${stamps}/${target||stamps||0}`;stampCurrent=stamps;stampTarget=target||stamps||0;stampMilestones=ms.map(x=>x.count);
         title=stampGoalTitle(t);
         status=next?`再 ${Math.max(0,next.count-stamps)} 個即可解鎖 ${rewardValueLabel(next.rewardType,next.reward)}`:`所有印花獎賞已解鎖`;
@@ -859,6 +865,7 @@ function getGoalRows(){
       title=rebateProgressTitle(t,rate);
       metaLines=homepageRequirementLines(t);
       const est=spent>=req?spent*rate/100:0,capped=caps.reward>0?Math.min(est,caps.reward):est;
+      rebateAmount=Math.max(0,capped);
       const statusParts=[`已簽賬 ${money(spent)}`];
       if(spent<req)statusParts.push(`尚欠 ${money(Math.max(0,req-spent))} 進入門檻`);
       if(caps.spend>0)statusParts.push(spent>=caps.spend?'已達簽賬上限':`尚餘額度 ${money(Math.max(0,caps.spend-spent))}`);
@@ -870,7 +877,7 @@ function getGoalRows(){
     const stageDatedHome=(t.mechanic==='milestone'||t.mechanic==='custom')&&t.targetType!=='welcome';
     if(campaignLine&&!stageDatedHome&&!metaLines.includes(campaignLine)&&metaLines.length<3)metaLines=[campaignLine,...metaLines];
     const titleHtml=esc(title);
-    rows.push({targetId:t.id,mechanic:t.mechanic,card:t.name,title:titleHtml,meta,metaLines,days:time.days,dayClass:remainingDayClass(time,completed),goalClass:remainingGoalClass(time,completed),progress,percent,status,completed,stampCurrent,stampTarget,stampMilestones,stageOverview,sortCard:t.name,sortType:goalSpendType(t),sortEnd:b.end||'',sortAdded:Number(t.createdAt||0)});
+    rows.push({targetId:t.id,mechanic:t.mechanic,card:t.name,title:titleHtml,meta,metaLines,days:time.days,dayClass:remainingDayClass(time,completed),goalClass:remainingGoalClass(time,completed),progress,percent,status,completed,rebateAmount,stampCurrent,stampTarget,stampMilestones,stageOverview,sortCard:t.name,sortType:goalSpendType(t),sortEnd:b.end||'',sortAdded:Number(t.createdAt||0)});
   });
   return sortGoalRows(rows);
 }
@@ -1004,10 +1011,10 @@ function bindHomePriorityJump(){
 function renderHomeOverview(){
   const box=document.getElementById('homeOverview');if(!box)return;
   const rows=getGoalRows(),transactions=monthTransactions(),total=transactions.reduce((sum,tx)=>sum+Math.max(0,Number(tx.amount||0)),0);
-  const completed=rows.filter(row=>row.completed).length,near=rows.filter(row=>!row.completed&&Number(row.progress||0)>=70).length;
+  const totalRebate=rows.reduce((sum,row)=>sum+Math.max(0,Number(row.rebateAmount||0)),0),near=rows.filter(row=>!row.completed&&Number(row.progress||0)>=70).length;
   syncHomePriorityIds();
   const selected=homePriorityIds.map(id=>rows.find(row=>String(row.targetId)===id)).filter(Boolean);
-  const stats=`<div class="home-stat"><span>本月簽賬</span><strong>${money(total)}</strong></div><div class="home-stat"><span>追蹤目標</span><strong>${rows.length}</strong></div><div class="home-stat"><span>已達標</span><strong>${completed}</strong></div>`;
+  const stats=`<div class="home-stat"><span>本月簽賬</span><strong>${money(total)}</strong></div><div class="home-stat"><span>目標</span><strong>${rows.length}</strong></div><div class="home-stat"><span>總回贈金額</span><strong>${money(totalRebate)}</strong></div>`;
   let focusRows='';
   if(!rows.length)focusRows='<div class="home-focus is-empty"><div><strong>建立第一個回贈目標</strong><p>加入優惠後，就可以自訂最重要的追蹤目標。</p></div></div>';
   else if(!selected.length)focusRows=homePriorityIds.length?'<div class="home-focus is-empty"><div><strong>這個月份未有主要追蹤目標</strong><p>你已選的目標仍會保留；切換月份即可查看。</p></div></div>':'<div class="home-focus is-empty"><div><strong>揀選你最想追的目標</strong><p>按一下下方目標卡，再按 ☆；最多可以加入 3 個。</p></div></div>';
@@ -2608,7 +2615,7 @@ function renderGoals(){
     const target=state.cards.find(x=>x.id===r.targetId),selected=homePriorityIds.includes(String(r.targetId));
     const delay=Math.min(i*24,140);
     const progressHtml=r.mechanic==='stamp'?renderStampProgress(r.stampCurrent,r.stampTarget,r.stampMilestones):(r.mechanic==='tier_rate'?v19RenderTierProgress(target,r):(r.mechanic==='standard'?v20RenderStandardProgress(target,r):`<div class="goal-progress-row"><div class="progress"><div style="--target-width:${r.progress}%"></div></div><div class="goal-percent">${r.percent}</div></div>`));
-    const priorityBadge=selected?'<span class="goal-priority-badge">★ 主要追蹤</span>':'';
+    const priorityBadge=selected?'<span class="goal-priority-badge">★</span>':'';
     return `<article class="goal ${r.completed?'completed':''} ${r.goalClass||''} ${selected?'is-priority':''}" data-target-id="${r.targetId}" data-mechanic="${esc(r.mechanic)}" style="--bar-delay:${delay}ms"><div class="goal-body"><div class="goal-card"><span class="goal-card-name">${esc(r.card)}</span>${priorityBadge}</div><div class="goal-title">${r.title}${r.completed?'<span class="trophy" title="目標達成" aria-label="目標達成">🏆</span>':''}<span class="goal-days ${r.dayClass}">${esc(r.days)}</span></div><div class="goal-meta">${renderGoalMeta(r.metaLines||[r.meta])}</div>${r.stageOverview?renderStageOverview(r.stageOverview):''}<div class="goal-lower">${progressHtml}<div class="goal-status">${renderGoalStatus(r.status)}</div></div></div><div class="goal-actions"><button class="goal-action goal-priority-toggle" type="button" aria-pressed="${selected?'true':'false'}" aria-label="${selected?'從主要追蹤移除':'加入主要追蹤'} ${esc(r.card)}" title="${selected?'取消追蹤':'主要追蹤'}">${selected?'★':'☆'}</button><button class="goal-action goal-modify" type="button" aria-label="修改 ${esc(r.card)} 優惠" title="修改">✎</button></div></article>`;
   }).join('');
   annotateProgressBars();bindGoalActions();scheduleGoalHeightEqualize();v27ScheduleMarkerLayout();
